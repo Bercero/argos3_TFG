@@ -1,0 +1,6 @@
+add_library(bayesian_decision_loop_functions MODULE
+  bayesian_decision_loop_functions.h
+  bayesian_decision_loop_functions.cpp)
+
+target_link_libraries(bayesian_decision_loop_functions
+  argos3core_simulator)

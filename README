@@ -1,0 +1,111 @@
+Experimentos con enjambres de robots en el simulador argos3
+La organización del código y los archivos de cmake para compilarlos están sacados
+del repositorio de ejemplos de argos:
+    https://github.com/ilpincy/argos3-examples.git
+
+Autor: Andrés López Soleto <andreslopezsoleto@gmail.com>
+
+
+*** COMPILACION ***
+
+Primero debes tener instalado el simulador argos3. Está disponible en muchos sistemas UNIX a través
+de los instaladores de paquetes, hay instrucciones esto y para usarlo en Windos aqui:
+https://www.argos-sim.info/core.php
+
+El código fuente está en github: https://github.com/ilpincy/argos3.git
+
+
+Una vez instalado argos, para ejecutar los experimentos hay primero que compilar.
+En una sesion de terminal y desde la carpeta padre, donde se encuentra esté archivo,
+creamos un directorio donde guardaran los ejecutables:
+
+$ mkdir build
+$ cd build
+
+Se pude configurar para compilar una version debuggable y una definitiva
+Para la debuggable:
+$ cmake -DCMAKE_BUILD_TYPE=Debug ..
+
+Para la no debuggable
+$ cmake -DCMAKE_BUILD_TYPE=Release ..
+
+Una vez configurado se puede compilar con:
+$ make
+
+*** PROBLEMAS EN LA INSTALCIÓN ***
+
+Al usar uno de los comandos cmake, puedes que se produzca un error con el
+mensaje 'package argos3_simulator' not found. Hay dos posibilidades:
+
+//TODO terminar el README
+1. You haven't installed ARGoS3 system-wide. To fix this, install
+   ARGoS3 through the packages or with the command 'sudo make install'
+   in the ARGoS3 build directory.
+
+2. pkg-config can't find the file argos3_simulator.pc. When you
+   install ARGoS3 from a package, this file is located in
+   /usr/lib/pkgconfig/. When you install ARGoS3 from the sources, this
+   file is located in $CMAKE_INSTALL_PREFIX/lib/pkgconfig/. If you
+   don't set $CMAKE_INSTALL_PREFIX explicitly before compiling, by
+   default it is set to /usr/local.  If the file is present and
+   pkg-config can't find it, add the directory where it's located to
+   the environment variable PKG_CONFIG_PATH, e.g.
+
+$ export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
+
+
+
+*** RUNNING THE EXAMPLES ***
+
+To run an example, the configuration files have been written with the
+hypothesis that you run them in the directory where you unpacked the
+tar.bz2, NOT in the build/ directory. Therefore, go to that directory
+and type:
+
+$ argos3 -c experiments/diffusion_1.argos
+
+for the example obstacle avoidance with a single robot,
+
+$ argos3 -c experiments/diffusion_10.argos
+
+for the example obstacle avoidance with 10 robots,
+
+$ argos3 -c experiments/synchronization.argos
+
+for the synchronization experiment,
+
+$ argos3 -c experiments/flocking.argos
+
+for the flocking experiment, and
+
+$ argos3 -c experiments/foraging.argos
+
+for the foraging experiment.
+The evolution experiments are divided in two parts. The
+command
+
+$ build/embedding/galib/galib_phototaxis
+
+runs the evolution process with the GALib library. Then, the command
+
+$ argos3 -c experiments/galib-trial.argos
+
+allows one to test a specific neural network.
+
+The command
+
+$ build/embedding/mpga/mpga_phototaxis
+
+runs the multi-process genetic algorithm. Then, the command
+
+$ argos3 -c experiments/mpga-trial.argos
+
+allows one to test a specific neural network.
+
+
+
+*** WHAT'S NEXT? ***
+
+More examples and a complete manual. I'm in the process of writing it,
+I do it a little bit every day. If you have specific questions, you
+can contact me at <ilpincy@gmail.com>.
