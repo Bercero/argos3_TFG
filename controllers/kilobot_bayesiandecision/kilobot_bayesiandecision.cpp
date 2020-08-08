@@ -12,7 +12,7 @@
 CKilobotBayesianDecision::CKilobotBayesianDecision() :
    motors(NULL),
    leds(NULL),
-   light_sensor(NULL),
+   // light_sensor(NULL),
    current_state(KILOBOT_STATE_STOP),
    previous_state(KILOBOT_STATE_STOP),
    max_turning_steps(50),
@@ -38,7 +38,7 @@ CKilobotBayesianDecision::CKilobotBayesianDecision() :
 
 void CKilobotBayesianDecision::Init(TConfigurationNode& t_node) {
 
-    light_sensor = GetSensor<CCI_KilobotLightSensor>("kilobot_light");
+    // light_sensor = GetSensor<CCI_KilobotLightSensor>("kilobot_light");
     motors = GetActuator<CCI_DifferentialSteeringActuator>("differential_steering");
     leds = GetActuator<CCI_KilobotLEDActuator>("kilobot_led");
 

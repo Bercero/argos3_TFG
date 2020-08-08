@@ -19,7 +19,6 @@
                 <kilobot_led implementation="default"/>
             </actuators>
             <sensors>
-                <kilobot_light implementation="rot_z_only" show_rays="true" />
             </sensors>
             <params mean_walk_duration="120" observation_interval="1" prior="25" feedback="true"/>
         </kilobot_bayesiandecision_controller>
@@ -75,22 +74,13 @@
                 </kilobot>
             </entity>
         </distribute> -->
-        <light id="light0"
-               position="0,0,0.1"
-               orientation="0,0,0"
-               color="yellow"
-               intensity="1.0"
-               medium="leds"/>
-
     </arena>
 
     <physics_engines>
         <dynamics2d id="dyn2d" />
     </physics_engines>
-    <media>
-        <led id="leds" />
-    </media>
 
+    <media/>
     <visualization>
         <qt-opengl>
             <camera>

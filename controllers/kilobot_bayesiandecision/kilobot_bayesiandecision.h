@@ -3,14 +3,12 @@
 
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/control_interface/ci_controller.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_led_actuator.h>
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_light_sensor.h>
-// #include <argos3/plugins/robots/generic/control_interface/ci_light_sensor.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/datatypes/color.h>
+#include <argos3/core/utility/logging/argos_log.h>
+#include <argos3/core/utility/configuration/argos_configuration.h>
+#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_led_actuator.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
 #include <map>
 
 
@@ -48,7 +46,7 @@ private:
 
     CCI_DifferentialSteeringActuator* motors;
     CCI_KilobotLEDActuator* leds;
-    CCI_KilobotLightSensor* light_sensor;
+    // CCI_KilobotLightSensor* light_sensor;
 
     /* estados para controlar el paseo aleatorio*/
     MovingStates current_state;

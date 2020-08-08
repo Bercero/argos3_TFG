@@ -45,13 +45,13 @@ void CBayesianDecisionLoopFunctions::Init(TConfigurationNode& t_tree) {
         index = rng->Uniform(CRange<UInt32>(0, grid.size()));
         grid.erase(grid.begin()+index);
     }
-    // CSpace::TMapPerType robot_map = CSimulator::GetInstance().GetSpace().GetEntitiesByType("kilobot");
-    // CKilobotEntity *kb;
-    // for (typeof(robot_map.begin()) it=robot_map.begin(); it!=robot_map.end(); ++it){
-    //     kb = any_cast<CKilobotEntity*>(it->second);
-    //     CCI_Controller *controller = &(kb->GetControllableEntity().GetController());
-    //     controllers.push_back( dynamic_cast<CKilobotBayesianDecision*>(controller) );
-    // }
+    CSpace::TMapPerType robot_map = CSimulator::GetInstance().GetSpace().GetEntitiesByType("kilobot");
+    CKilobotEntity *kb;
+    for (typeof(robot_map.begin()) it=robot_map.begin(); it!=robot_map.end(); ++it){
+        kb = any_cast<CKilobotEntity*>(it->second);
+        CCI_Controller *controller = &(kb->GetControllableEntity().GetController());
+        controllers.push_back( dynamic_cast<CKilobotBayesianDecision*>(controller) );
+    }
 }
 
 /****************************************/
@@ -63,13 +63,12 @@ void CBayesianDecisionLoopFunctions::Reset() {
 }
 
 bool CBayesianDecisionLoopFunctions::IsExperimentFinished() {
-    // for(int i = 0; i < controllers.size(); i++){
-    //     if( controllers[i]->GetDecision()== -1)
-    //         return false;
-    // }
-    // LOG<<"Experimento finalizado: Todos los robots han tomado una decision\n";
-    // return true;
-    return false;
+    for(int i = 0; i < controllers.size(); i++){
+        if( controllers[i]->GetDecision()== -1)
+            return false;
+    }
+    LOG<<"Experimento finalizado: Todos los robots han tomado una decision\n";
+    return true;
 }
 
 CColor CBayesianDecisionLoopFunctions::GetFloorColor(const CVector2& c_pos_on_floor){
