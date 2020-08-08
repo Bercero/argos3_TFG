@@ -16,11 +16,12 @@
 
             <actuators>
                 <differential_steering implementation="default" />
+                <kilobot_led implementation="default"/>
             </actuators>
             <sensors>
-
+                <kilobot_light implementation="rot_z_only" show_rays="true" />
             </sensors>
-            <params max_motion_steps="100" />
+            <params mean_walk_duration="120" observation_interval="1" prior="25" feedback="true"/>
         </kilobot_bayesiandecision_controller>
 
     </controllers>
@@ -42,17 +43,17 @@
         <!-- indica que la textura del suelo se crea mediante una funcion al principio -->
         <floor id="floor" source="loop_functions" pixels_per_meter="200"/>
         <!-- cuatro paredes -->
-            <box id="wall_north" size="2.4,0.1,0.5" movable="false">
-                <body position="0,1.25,0" orientation="0,0,0" />
+            <box id="wall_north" size="2.4,0.05,0.1" movable="false">
+                <body position="0,1.225,0" orientation="0,0,0" />
             </box>
-            <box id="wall_south" size="2.4,0.1,0.5" movable="false">
-                <body position="0,-1.25,0" orientation="0,0,0" />
+            <box id="wall_south" size="2.4,0.05,0.1" movable="false">
+                <body position="0,-1.225,0" orientation="0,0,0" />
             </box>
-            <box id="wall_east" size="0.1,2.4,0.5" movable="false">
-                <body position="1.25,0,0" orientation="0,0,0" />
+            <box id="wall_east" size="0.05,2.4,0.1" movable="false">
+                <body position="1.225,0,0" orientation="0,0,0" />
             </box>
-            <box id="wall_west" size="0.1,2.4,0.5" movable="false">
-                <body position="-1.25,0,0" orientation="0,0,0" />
+            <box id="wall_west" size="0.05,2.4,0.1" movable="false">
+                <body position="-1.225,0,0" orientation="0,0,0" />
             </box>
 
         <!-- instacia los robots -->
@@ -60,18 +61,40 @@
             <body position="0,0,0" orientation="0,0,0" />
             <controller config="kbdc"/>
         </kilobot>
+        <!-- <kilobot id="k_1">
+            <body position="0.06,0,0" orientation="0,0,0" />
+            <controller config="kbdc"/>
+        </kilobot> -->
+
+        <!-- <distribute>
+            <position method="uniform" min="-1.10,-1.10,0" max="1.10,1.10,0" />
+            <orientation method="uniform" min="0,0,0" max="360,0,0" />
+            <entity quantity="100" max_trials="1000">
+                <kilobot id="k">
+                    <controller config="kbdc" />
+                </kilobot>
+            </entity>
+        </distribute> -->
+        <light id="light0"
+               position="0,0,0.1"
+               orientation="0,0,0"
+               color="yellow"
+               intensity="1.0"
+               medium="leds"/>
 
     </arena>
 
     <physics_engines>
         <dynamics2d id="dyn2d" />
     </physics_engines>
-    <media />
+    <media>
+        <led id="leds" />
+    </media>
 
     <visualization>
         <qt-opengl>
             <camera>
-                <placement idx="0" position="0,0,4" look_at="0,0,0" up="0,1,0" lens_focal_length="20" />
+                <placement idx="0" position="0,0,2" look_at="0,0,0" up="0,1,0" lens_focal_length="20" />
             </camera>
         </qt-opengl>
     </visualization>

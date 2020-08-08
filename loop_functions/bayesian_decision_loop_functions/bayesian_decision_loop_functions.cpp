@@ -1,12 +1,14 @@
 #include "bayesian_decision_loop_functions.h"
 
-CBayesianDecisionLoopFunctions::CBayesianDecisionLoopFunctions(): CLoopFunctions(), fill_ratio(0.8), grid_resolution_x(10){}
+CBayesianDecisionLoopFunctions::CBayesianDecisionLoopFunctions():
+ CLoopFunctions(), fill_ratio(0.8), grid_resolution_x(10){}
 
 void CBayesianDecisionLoopFunctions::Init(TConfigurationNode& t_tree) {
 
     //lee los paramatros del archivo de configuracion con extesion .argos
     if(NodeExists(t_tree, "params")){
         TConfigurationNode params = GetNode(t_tree, "params");
+        //TODO comprobar valores de los parametros antes de aceptarlos
         GetNodeAttributeOrDefault(params, "fill_ratio", fill_ratio, fill_ratio);
         GetNodeAttributeOrDefault(params, "grid_resolution", grid_resolution_x, grid_resolution_x);
     }
@@ -43,15 +45,31 @@ void CBayesianDecisionLoopFunctions::Init(TConfigurationNode& t_tree) {
         index = rng->Uniform(CRange<UInt32>(0, grid.size()));
         grid.erase(grid.begin()+index);
     }
-
+    // CSpace::TMapPerType robot_map = CSimulator::GetInstance().GetSpace().GetEntitiesByType("kilobot");
+    // CKilobotEntity *kb;
+    // for (typeof(robot_map.begin()) it=robot_map.begin(); it!=robot_map.end(); ++it){
+    //     kb = any_cast<CKilobotEntity*>(it->second);
+    //     CCI_Controller *controller = &(kb->GetControllableEntity().GetController());
+    //     controllers.push_back( dynamic_cast<CKilobotBayesianDecision*>(controller) );
+    // }
 }
 
 /****************************************/
 /****************************************/
 
 void CBayesianDecisionLoopFunctions::Reset() {
-    rng->Reset();
+    // rng->Reset();//TODO Parece que no es necesario
+    //TODO Tampoco parece necesario regenerar el vector de robots entre reinicios
+}
 
+bool CBayesianDecisionLoopFunctions::IsExperimentFinished() {
+    // for(int i = 0; i < controllers.size(); i++){
+    //     if( controllers[i]->GetDecision()== -1)
+    //         return false;
+    // }
+    // LOG<<"Experimento finalizado: Todos los robots han tomado una decision\n";
+    // return true;
+    return false;
 }
 
 CColor CBayesianDecisionLoopFunctions::GetFloorColor(const CVector2& c_pos_on_floor){

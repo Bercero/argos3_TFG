@@ -14,6 +14,7 @@ https://www.argos-sim.info/core.php
 
 El código fuente está en github: https://github.com/ilpincy/argos3.git
 
+TODO instalar boost probablemente
 
 Una vez instalado argos, para ejecutar los experimentos hay primero que compilar.
 En una sesion de terminal y desde la carpeta padre, donde se encuentra esté archivo,

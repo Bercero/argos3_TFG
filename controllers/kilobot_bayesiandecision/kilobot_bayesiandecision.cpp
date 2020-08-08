@@ -1,105 +1,176 @@
-/* Include the controller definition */
 #include "kilobot_bayesiandecision.h"
-/* Function definitions for XML parsing */
-#include <argos3/core/utility/configuration/argos_configuration.h>
-/* 2D vector definition */
-#include <argos3/core/utility/math/vector2.h>
-#include <vector>
-#include <algorithm>
 
 /****************************************/
 /****************************************/
 
+//velocidades para asignar a los motores
 #define PIN_FORWARD 1.0f;
 #define PIN_TURN    1.57f;
 #define PIN_STOP    0.0f;
 
+
 CKilobotBayesianDecision::CKilobotBayesianDecision() :
-   m_pcMotors(NULL),
-   m_tCurrentState(KILOBOT_STATE_STOP),
-   m_tPreviousState(KILOBOT_STATE_STOP),
-   m_unMaxMotionSteps(50),
-   m_unCountMotionSteps(0),
-   m_unMaxTurningSteps(50), // = pi/(omega delta_t) = pi/(v*delta_t/l) = (pi*l)/(v*delta_t)
-   m_unCountTurningSteps(100),
-   m_fMotorL(0.0f),
-   m_fMotorR(0.0f)
+   motors(NULL),
+   leds(NULL),
+   light_sensor(NULL),
+   current_state(KILOBOT_STATE_STOP),
+   previous_state(KILOBOT_STATE_STOP),
+   max_turning_steps(50),
+   turning_steps(1),
+   decision(-1),
+   motor_L(0.0f),
+   motor_R(0.0f),
+   observations_index(0),
+   walking_steps(0),
+   mean_walk_duration(240),
+   observation_interval(300),
+   observation_count_down(300),
+   prior(25),
+   feedback(true),
+   last_observation(-1)
 {
-   m_pcRNG = CRandom::CreateRNG( "argos" );
+   rng = CRandom::CreateRNG( "argos" );
 }
 
 /****************************************/
+/* Se leen lor parametros de confinguración*/
 /****************************************/
 
 void CKilobotBayesianDecision::Init(TConfigurationNode& t_node) {
 
-   m_pcMotors    = GetActuator<CCI_DifferentialSteeringActuator>("differential_steering");
+    light_sensor = GetSensor<CCI_KilobotLightSensor>("kilobot_light");
+    motors = GetActuator<CCI_DifferentialSteeringActuator>("differential_steering");
+    leds = GetActuator<CCI_KilobotLEDActuator>("kilobot_led");
 
-   // Parse the configuration file
-   GetNodeAttributeOrDefault(t_node, "max_motion_steps", m_unMaxMotionSteps, m_unMaxMotionSteps );
-   if( m_unMaxMotionSteps == 0 ) {
-      LOGERR << "[FATAL] Invalid value for num_moving_steps (" << m_unMaxMotionSteps << "). Should be a positive integer." << std::endl;
-   }
+    //leyendo del archivo de configuración
+    TConfigurationNode experiment_conf = GetNode(CSimulator::GetInstance().GetConfigurationRoot(), "framework");
+    experiment_conf = GetNode(experiment_conf,"experiment");
+    GetNodeAttribute(experiment_conf, "ticks_per_second", ticks_per_second);
+    // max_turning_steps = 2 * ticks_per_second; // (pi / PIN_TURN)*ticks_per_second -> media vuelta
+    max_turning_steps = 5*ticks_per_second; // TODO no entiendo por que es 5
 
-   Reset();
+    GetNodeAttributeOrDefault(t_node, "mean_walk_duration", mean_walk_duration, mean_walk_duration);
+    GetNodeAttributeOrDefault(t_node, "observation_interval", observation_interval, observation_interval);
+    observation_interval *= ticks_per_second;
+    GetNodeAttributeOrDefault(t_node, "prior", prior, prior);
+    GetNodeAttributeOrDefault(t_node, "feedback", feedback, feedback);
+
+    //TODO comprobar parametros de configuración
+    // if( m_unMaxMotionSteps == 0 ) {
+    //    LOGERR << "[FATAL] Invalid value for num_moving_steps (" << m_unMaxMotionSteps << "). Should be a positive integer." << std::endl;
+    // }
+
+    Reset();
 }
 
 /****************************************/
 /****************************************/
-
+//TODO parece que se llama dos veces cuando se pulsa reset en la interfaz grafica. Es un bug?
 void CKilobotBayesianDecision::Reset() {
-   // reset/intialise the robot state
-   m_unCountMotionSteps = m_pcRNG->Uniform(CRange<UInt32>(1,m_unMaxMotionSteps+1));
-   m_tCurrentState = KILOBOT_STATE_MOVING;
-   m_tPreviousState = KILOBOT_STATE_MOVING;
-   m_fMotorL = m_fMotorR = PIN_FORWARD;
+    observation_count_down = observation_interval;
+    //TODO el parametro del experimento original parece ser demasiado aqui
+    walking_steps = rng->Exponential(mean_walk_duration) * ticks_per_second;
+    //TODO cambiar esto cuando detecten colisiones
+    walking_steps = walking_steps % 3400;
+
+    current_state = KILOBOT_STATE_MOVING;
+    previous_state = KILOBOT_STATE_MOVING;
+    motor_L = motor_R = PIN_FORWARD;
+    decision = -1;
+    observations_index = 0;
+
+    messages.clear();
+    leds->SetColor(CColor::RED);
 }
 
 /****************************************/
 /****************************************/
 
 void CKilobotBayesianDecision::ControlStep() {
-   // compute the robot motion: move forward for a fixed amount of
+    if(decision == -1 && --observation_count_down == 0){
+        Observe();
+        observation_count_down = observation_interval;
+    }
+    if(observations_index > 0){
+        if(feedback && decision != -1)
+            Broadcast(decision);
+        else
+            Broadcast(last_observation);
+    }
+
    // time, and rotate cw/ccw for a random amount of time
-   // max rotation: 180 degrees as determined by m_unMaxTurningSteps
-   m_tPreviousState = m_tCurrentState;
-   switch(m_tCurrentState) {
+   // max rotation: 180 degrees as determined by max_turning_steps
+   previous_state = current_state;
+   switch(current_state) {
    case KILOBOT_STATE_TURNING:
-      if( --m_unCountTurningSteps == 0 ) {
-         m_fMotorL = m_fMotorR = PIN_FORWARD;
-         m_unCountMotionSteps = m_unMaxMotionSteps;
-         m_tCurrentState = KILOBOT_STATE_MOVING;
+      if( --turning_steps == 0 ) {
+         motor_L = motor_R = PIN_FORWARD;
+         walking_steps = rng->Exponential(mean_walk_duration) * ticks_per_second;
+         current_state = KILOBOT_STATE_MOVING;
       }
       break;
 
    case KILOBOT_STATE_MOVING:
-      if( --m_unCountMotionSteps == 0 ) {
-         UInt32 direction = m_pcRNG->Uniform(CRange<UInt32>(0,2));
+      if( --walking_steps == 0 ) {
+         direction = rng->Uniform(CRange<UInt32>(0,2));
          if( direction == 0 ) {
-            m_fMotorL = PIN_TURN;
-            m_fMotorR = PIN_STOP;
+            motor_L = PIN_TURN;
+            motor_R = PIN_STOP;
          }
          else {
-            m_fMotorL = PIN_STOP;
-            m_fMotorR = PIN_TURN;
+            motor_L = PIN_STOP;
+            motor_R = PIN_TURN;
          }
-         m_unCountTurningSteps = m_pcRNG->Uniform(CRange<UInt32>(1,m_unMaxTurningSteps));
-         m_tCurrentState = KILOBOT_STATE_TURNING;
+         turning_steps = rng->Uniform(CRange<UInt32>(0,max_turning_steps));
+         current_state = KILOBOT_STATE_TURNING;
       }
       break;
 
    case KILOBOT_STATE_STOP:
    default:
-      m_fMotorL = m_fMotorR = PIN_STOP;
+      motor_L = motor_R = PIN_STOP;
       break;
    };
 
-   m_pcMotors->SetLinearVelocity(m_fMotorL, m_fMotorR);
+   motors->SetLinearVelocity(motor_L, motor_R);
 }
 
 /****************************************/
 /****************************************/
+void CKilobotBayesianDecision::Observe() {
+    observations_index ++;
+    // reading = light_sensor->GetReading();
+    // LOG<<reading<<std::endl;
+    LOG<<"Castrochachos al poder"<<std::endl;
+    // last_observation = ;
 
+    // LOG<<GetId()<<" observando\n";
+    //calculatePosterior();
+}
+
+void CKilobotBayesianDecision::Broadcast(SInt8 message) {
+    // LOG<<GetId()<<" transmite "<< observations_index << ":" << message <<"\n";
+}
+
+void CKilobotBayesianDecision::Recibe(std::string id,UInt32 index, SInt8 obs){
+    if(GetId()!=id){
+        new_data = false;
+
+        if(messages.find(id)==messages.end())
+        {
+            messages[id] = index;
+            new_data = true;
+        }
+        else if(messages[id] != index)
+        {
+            new_data = true;
+            messages[id] = index;
+        }
+
+        // if(new_data)
+        //     anotardato()
+    }
+}
 
 /*
  * This statement notifies ARGoS of the existence of the controller.
