@@ -42,20 +42,23 @@ public:
 
    void Broadcast(SInt8 obs);
 
-   void CheckMessages();
+   void PollMessages();
+
+   void static setIdNum(CKilobotBayesianDecision* robot);
 
    inline const SInt8 GetDecision() const {return decision;}
    inline const MovingStates GetCurrentState() const {return current_state;};
    inline const bool MovingStateChanged() const {return (previous_state != current_state);};
 
 private:
+    static UInt16 id_counter;
 
     CCI_DifferentialSteeringActuator* motors;
     CCI_KilobotLEDActuator* leds;
     // CCI_KilobotLightSensor* light_sensor;
     CCI_GroundSensor* ground_sensors;
-    CCI_KilobotCommunicationSensor * com_reciber;
-    CCI_KilobotCommunicationActuator* com_transmiter;
+    CCI_KilobotCommunicationSensor * com_rx;
+    CCI_KilobotCommunicationActuator* com_tx;
 
     /* estados para controlar el paseo aleatorio*/
     MovingStates current_state;
@@ -73,30 +76,40 @@ private:
     Real   motor_L;
     Real   motor_R;
 
-    UInt32 broadcast_interval;
-    UInt32 broadcast_count_down;
+    Real com_interval;
+    Real com_timer;
 
     //parametros relacionados con las observaciones y el modelo estadistico de decision
-    UInt32 observation_interval;
-    UInt32 observation_count_down;
-    UInt32 observations_index;
-    SInt8 last_observation;
+    Real obs_interval;
+    Real obs_timer;
+    UInt32 obs_index;
+    SInt8 last_obs;
     SInt8 decision;
     Real prior;
     bool feedback;
 
     //diccionario para saber cual es la ultima observacion recibida de cada robot
-    std::map<std::string, UInt32> messages;
+    std::map<UInt16, UInt32> old_msgs;
 
     /* Generador de números aleatorios */
     CRandom::CRNG*  rng;
 
     //variables para metodos que declaro aqui para que no tengan que alojarse dinamicamente cuando
-    //se llama a esos metodos
+    //se llama a esos metodos repetidamente
     UInt32 ticks_per_second;
     UInt32 direction;
     SInt16 reading;
-    bool new_data;
+    bool is_new;
+    message_t* out_msg;
+    CCI_KilobotCommunicationSensor::TPackets in_msgs;
+    UInt8 * byte_ptr;
+    UInt16 *id_msg;
+    UInt32 *obs_index_msg;
+    UInt8 obs_msg;
+    std::map<UInt16, UInt32>::iterator it;
+
+    UInt16 id_num;
+
 
 };
 
