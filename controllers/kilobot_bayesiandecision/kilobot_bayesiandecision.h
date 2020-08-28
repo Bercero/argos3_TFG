@@ -103,8 +103,8 @@ private:
     message_t* out_msg;
     CCI_KilobotCommunicationSensor::TPackets in_msgs;
     UInt8 * byte_ptr;
-    UInt16 *id_msg;
-    UInt32 *obs_index_msg;
+    UInt16 id_msg;
+    UInt32 obs_index_msg;
     UInt8 obs_msg;
     std::map<UInt16, UInt32>::iterator it;
 

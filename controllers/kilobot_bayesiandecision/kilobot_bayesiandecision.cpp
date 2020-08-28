@@ -155,7 +155,7 @@ void CKilobotBayesianDecision::ControlStep() {
 void CKilobotBayesianDecision::Observe() {
     obs_index ++;
     std::vector<Real> readings  = ground_sensors->GetReadings();
-    LOG<<GetId()<<" observa "<< readings[0]<<" " <<readings[1]<<std::endl;
+    LOG<<GetId()<<" realiza observacion "<<obs_index <<std::endl;
     last_obs = readings[0];
 
     //calculatePosterior();
@@ -183,7 +183,7 @@ void CKilobotBayesianDecision::Broadcast(SInt8 obs) {
     out_msg->crc = 4;//TODO computar crc, no es necesario de momento, pero puede que cambiar al actualizarse el plugin de los kilobots
 
     com_tx->SetMessage(out_msg);
-    LOG<<id_num<<" envia "<< obs_index << " "<< obs<<std::endl;
+    LOG<<GetId()<<" envia observacion"<< obs_index <<std::endl;
 
 }
 
@@ -192,34 +192,31 @@ void CKilobotBayesianDecision::PollMessages(){
     if(GetId() =="k_0"){
         in_msgs = com_rx->GetPackets();
         if(in_msgs.size() > 0){
-            LOG<<id_num<<" recibe "<<in_msgs.size()<<" mensajes"<<std::endl;
+            LOG<<GetId()<<" recibe mensajes"<<std::endl;
             for(UInt32 i = 0; i < in_msgs.size(); i++ ){
-                id_msg = (UInt16 *) in_msgs[i].Message->data;
-                obs_index_msg = (UInt32 *) (in_msgs[i].Message->data + 2);
+                id_msg = (UInt16) in_msgs[i].Message->data[0];
+                obs_index_msg = (UInt32) in_msgs[i].Message->data[2];
                 obs_msg = in_msgs[i].Message->data[6];
-                LOG<<"___: "<< *id_msg<<" "<<*obs_index_msg<< " "<< obs_msg<<std::endl;
+
+                if(id_num != id_msg){
+
+                    //comprobando si es información nueva
+                    it = old_msgs.find(id_msg);
+                    if( it == old_msgs.end())
+                    {
+                        //inserta el mensaje
+                        old_msgs[id_msg] = obs_index_msg;
+                    }
+                    else if(it->second != obs_index_msg)
+                    {
+                        //actualiza el mensaje guardado con el nuevo indice de observacion
+                        it->second = obs_index_msg;
+                    }
+
+                }
             }
             // estimate_distance(& (in_msgs[i].Distance));
         }
-
-
-        // if(id_num != id_msg){
-        //     new_data = false;
-        //     it = old_msgs.find(id_msg)
-        //     if( it == old_msgs.end())
-        //     {
-        //         old_msgs[id_msg] = ;
-        //         new_data = true;
-        //     }
-        //     else if(old_msgs[id] != index)
-        //     {
-        //         new_data = true;
-        //         old_msgs[id] = index;
-        //     }
-        //
-        //     if(new_data)
-        //         anotardato()
-        // }
     }
 }
 void CKilobotBayesianDecision::setIdNum(CKilobotBayesianDecision* robot){

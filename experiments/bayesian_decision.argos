@@ -67,7 +67,7 @@
             <body position="0.06,0.01,0" orientation="0,0,0" />
             <controller config="kbdc"/>
         </kilobot>
-        <kilobot id="k_2">
+        <!-- <kilobot id="k_2">
             <body position="-0.06,0,0" orientation="0,0,0" />
             <controller config="kbdc"/>
         </kilobot>
@@ -78,7 +78,7 @@
         <kilobot id="k_4">
             <body position="0.0,0.07,0" orientation="0,0,0" />
             <controller config="kbdc"/>
-        </kilobot>
+        </kilobot> -->
 
         <!-- <distribute>
             <position method="uniform" min="-1.10,-1.10,0" max="1.10,1.10,0" />
