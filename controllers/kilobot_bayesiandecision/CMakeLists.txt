@@ -2,4 +2,5 @@ add_library(kilobot_bayesiandecision SHARED kilobot_bayesiandecision.h kilobot_b
 target_link_libraries(kilobot_bayesiandecision
   argos3core_simulator
   argos3plugin_simulator_kilobot
+  argos3plugin_simulator_kilolib
   argos3plugin_simulator_genericrobot)

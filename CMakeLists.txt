@@ -1,48 +1,28 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(argos_andres)
 
-if(APPLE)
-  option(ASAN "Use Clang Address Sanitizer in Debug builds")
-  if(ASAN)
-    # Add address sanitizer support for CLang
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=address -fno-optimize-sibling-calls -fno-omit-frame-pointer")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-optimize-sibling-calls -fno-omit-frame-pointer")
-    set(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} -fsanitize=address")
-    set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} -fsanitize=address")
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} -fsanitize=address")
-  endif(ASAN)
-endif(APPLE)
-
 # Deactivate RPATH for MacOSX
 set(CMAKE_MACOSX_RPATH 0)
+# Set CMake policies to select wanted behaviors
+#
+# Use new policies introduced up to this version
+cmake_policy(VERSION 2.8.12)
+if(POLICY CMP0042)
+    cmake_policy(SET CMP0042 NEW)
+endif(POLICY CMP0042)
 
-# Set the path where CMake will find additional scripts
+#
+# Set build options, compiler flags
 set(CMAKE_MODULE_PATH $ENV{CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
+include(ARGoSBuildOptions)
+include(ARGoSBuildFlags)
+include(ARGoSBuildChecks)
 
-# Find the ARGoS package, make sure to save the ARGoS prefix
-find_package(PkgConfig)
-pkg_check_modules(ARGOS REQUIRED argos3_simulator)
-set(ARGOS_PREFIX ${ARGOS_PREFIX} CACHE INTERNAL "")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ARGOS_PREFIX}/share/argos3/cmake)
+include_directories(${CMAKE_SOURCE_DIR})
 
-# Check whether all the necessary libs have been installed to compile the
-# code that depends on Qt and OpenGL
-include(ARGoSCheckQTOpenGL)
-
-# Find Lua
-find_package(Lua53 REQUIRED)
-
-# Set ARGoS include dir
-include_directories(${CMAKE_SOURCE_DIR} ${ARGOS_INCLUDE_DIRS} ${LUA_INCLUDE_DIR})
-
-# Set ARGoS link dir
-link_directories(${ARGOS_LIBRARY_DIRS})
-
-# Descend into the controllers directory
+# Descend into the following directories
+# add_subdirectory(behaviors)
 add_subdirectory(controllers)
-
-# Descend into the loop_functions directory
 add_subdirectory(loop_functions)
-
-# Descend into the utility directory
-add_subdirectory(utility)
+add_subdirectory(plugins)
+#add_subdirectory(utility)

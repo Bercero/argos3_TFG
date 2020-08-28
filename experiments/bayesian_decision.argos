@@ -6,21 +6,24 @@
         <system threads="0" />
         <experiment length="0"
                     ticks_per_second="10"
-                    random_seed="124" />
+                    random_seed="12" />
     </framework>
 
     <controllers>
 
         <kilobot_bayesiandecision_controller id="kbdc"
-                                  library="build/controllers/kilobot_bayesiandecision/libkilobot_bayesiandecision">
+                    library="build/controllers/kilobot_bayesiandecision/libkilobot_bayesiandecision">
 
             <actuators>
                 <differential_steering implementation="default" />
                 <kilobot_led implementation="default"/>
+                <kilobot_communication implementation="default" />
             </actuators>
             <sensors>
+                <ground implementation="rot_z_only" />
+                <kilobot_communication implementation="default" medium="kilomedium" show_rays="true"/>
             </sensors>
-            <params mean_walk_duration="120" observation_interval="1" prior="25" feedback="true"/>
+            <params mean_walk_duration="50" observation_interval="3" prior="25" feedback="true"/>
         </kilobot_bayesiandecision_controller>
 
     </controllers>
@@ -57,11 +60,23 @@
 
         <!-- instacia los robots -->
         <kilobot id="k_0">
-            <body position="0,0,0" orientation="0,0,0" />
+            <body position="0,0.04,0" orientation="0,0,0" />
             <controller config="kbdc"/>
         </kilobot>
-        <!-- <kilobot id="k_1">
-            <body position="0.06,0,0" orientation="0,0,0" />
+        <kilobot id="k_1">
+            <body position="0.06,0.01,0" orientation="0,0,0" />
+            <controller config="kbdc"/>
+        </kilobot>
+        <!-- <kilobot id="k_2">
+            <body position="-0.06,0,0" orientation="0,0,0" />
+            <controller config="kbdc"/>
+        </kilobot>
+        <kilobot id="k_3">
+            <body position="0.4,0.6,0" orientation="0,0,0" />
+            <controller config="kbdc"/>
+        </kilobot>
+        <kilobot id="k_4">
+            <body position="0.0,0.07,0" orientation="0,0,0" />
             <controller config="kbdc"/>
         </kilobot> -->
 
@@ -80,7 +95,10 @@
         <dynamics2d id="dyn2d" />
     </physics_engines>
 
-    <media/>
+    <media>
+        <!-- TODO parametros temporales -->
+        <kilobot_communication id="kilomedium" message_drop_prob="0.0" ignore_conflicts="true"/>
+    </media>
     <visualization>
         <qt-opengl>
             <camera>

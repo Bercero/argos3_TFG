@@ -1,10 +1,8 @@
 #include "bayesian_decision_loop_functions.h"
-
 CBayesianDecisionLoopFunctions::CBayesianDecisionLoopFunctions():
  CLoopFunctions(), fill_ratio(0.8), grid_resolution_x(10){}
 
 void CBayesianDecisionLoopFunctions::Init(TConfigurationNode& t_tree) {
-
     //lee los paramatros del archivo de configuracion con extesion .argos
     if(NodeExists(t_tree, "params")){
         TConfigurationNode params = GetNode(t_tree, "params");
@@ -35,7 +33,7 @@ void CBayesianDecisionLoopFunctions::Init(TConfigurationNode& t_tree) {
         grid_resolution_y ++ ;
 
     //vector con los indices de todos los cuadros
-    for(int i=0; i< (grid_resolution_x * grid_resolution_y); i++){
+    for(UInt32 i=0; i< (grid_resolution_x * grid_resolution_y); i++){
         grid.push_back(i);
     }
     //se eliminan indices aletorimente hasta que quedan fill_ratio*numero_inicial de casillas
@@ -63,9 +61,10 @@ void CBayesianDecisionLoopFunctions::Reset() {
 }
 
 bool CBayesianDecisionLoopFunctions::IsExperimentFinished() {
-    for(int i = 0; i < controllers.size(); i++){
+    for(UInt32 i = 0; i < controllers.size(); i++){
         if( controllers[i]->GetDecision()== -1)
             return false;
+
     }
     LOG<<"Experimento finalizado: Todos los robots han tomado una decision\n";
     return true;
@@ -76,7 +75,7 @@ CColor CBayesianDecisionLoopFunctions::GetFloorColor(const CVector2& c_pos_on_fl
     Real pos_x = c_pos_on_floor.GetX() + offset_x;
     UInt32 index = UInt32(pos_y/square_size) * (grid_resolution_x);
     index += UInt32(pos_x/square_size);
-    for(int i = 0; i < grid.size() ; i++){
+    for(UInt32 i = 0; i < grid.size() ; i++){
         if (index == grid.at(i))
             return CColor::WHITE;
     }

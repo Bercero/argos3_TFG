@@ -10,7 +10,7 @@
 #include <argos3/core/utility/math/vector3.h>
 #include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/plugins/robots/kilobot/simulator/kilobot_entity.h>
-#include "kilobot_bayesiandecision.h"
+#include "controllers/kilobot_bayesiandecision/kilobot_bayesiandecision.h"
 
 using namespace argos;
 
