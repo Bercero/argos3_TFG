@@ -26,8 +26,10 @@ CKilobotBayesianDecision::CKilobotBayesianDecision() :
    mean_walk_duration(240),
    obs_interval(300),
    com_interval(0.5),
+   floor_end_interval(0.5),
    obs_timer(0),
    com_timer(0),
+   floor_end_timer(0),
    prior(25),
    feedback(true),
    last_obs(-1)
@@ -56,11 +58,13 @@ void CKilobotBayesianDecision::Init(TConfigurationNode& t_node) {
     max_turning_steps = 5*ticks_per_second; // TODO no entiendo por que es 5
 
 
-    GetNodeAttributeOrDefault(t_node, "mean_walk_duration", mean_walk_duration, mean_walk_duration);
     GetNodeAttributeOrDefault(t_node, "observation_interval", obs_interval, obs_interval);
-    obs_interval *= ticks_per_second;
     GetNodeAttributeOrDefault(t_node, "broadcast_interval", com_interval, com_interval);
+    GetNodeAttributeOrDefault(t_node, "avoidance_interval", floor_end_interval, floor_end_interval);
+    obs_interval *= ticks_per_second;
     com_interval *= ticks_per_second;
+    floor_end_interval *= ticks_per_second;
+    GetNodeAttributeOrDefault(t_node, "mean_walk_duration", mean_walk_duration, mean_walk_duration);
     GetNodeAttributeOrDefault(t_node, "prior", prior, prior);
     GetNodeAttributeOrDefault(t_node, "feedback", feedback, feedback);
 
@@ -77,7 +81,8 @@ void CKilobotBayesianDecision::Init(TConfigurationNode& t_node) {
 //TODO parece que se llama dos veces cuando se pulsa reset en la interfaz grafica. Es un bug?
 void CKilobotBayesianDecision::Reset() {
     obs_timer = obs_interval;
-    com_timer = com_interval;
+    floor_end_timer = floor_end_interval;
+    com_timer = rng->Uniform(CRange<UInt32>(1, (UInt32) com_interval));
     //TODO el parametro del experimento original parece ser demasiado aqui
     walking_steps = rng->Exponential(mean_walk_duration) * ticks_per_second;
     //TODO cambiar esto cuando detecten colisiones
@@ -98,15 +103,26 @@ void CKilobotBayesianDecision::Reset() {
 
 void CKilobotBayesianDecision::ControlStep() {
 
-    CheckGround();
+    //cada cierto tiempo se comprueba que el suelo sea gris, lo que indicaria el fin de la arena
+    if(--floor_end_timer <=0){
+        CheckGray();
+        floor_end_timer = floor_end_interval;
+    }
+    //comprobar si toca hacer observación
+    if(decision == -1 && --obs_timer <= 0)
+    {
+        CheckBlackWhite();
+        obs_timer = obs_interval;
+        //calculatePosterior();
+    }
 
-    //TODO iniciar el temporizador aletoriamente en init
-    if(obs_index > 0 && com_timer <= 0){
+    if(obs_index > 0 && --com_timer <= 0){
         if(feedback && decision != -1)
             Broadcast(decision);
         else
             Broadcast(last_obs);
         com_timer = com_interval;
+        LOG<<GetId()<<std::endl;
     }
     PollMessages();
 
@@ -165,13 +181,11 @@ void CKilobotBayesianDecision::ControlStep() {
    };
 
    motors->SetLinearVelocity(motor_L, motor_R);
-   obs_timer--;
-   com_timer--;
 }
 
 /****************************************/
 /****************************************/
-void CKilobotBayesianDecision::CheckGround() {
+void CKilobotBayesianDecision::CheckGray() {
     std::vector<Real> readings  = ground_sensors->GetReadings();
     //detectando cuando si ha llegado al margen de la arena
     if(current_state != KILOBOT_STATE_AVOIDING
@@ -183,14 +197,12 @@ void CKilobotBayesianDecision::CheckGround() {
         walking_steps = 5 * ticks_per_second;
         motor_L = motor_R = - PIN_FORWARD;
     }
-    //comprobar si toca hacer observación
-    if(decision == -1 && obs_timer <= 0)
-    {
-        last_obs = readings[0];
-        obs_timer = obs_interval;
-        obs_index ++;
-        //calculatePosterior();
-    }
+}
+
+void CKilobotBayesianDecision::CheckBlackWhite() {
+    std::vector<Real> readings  = ground_sensors->GetReadings();
+    last_obs = readings[0];
+    obs_index ++;
 }
 
 void CKilobotBayesianDecision::Broadcast(SInt8 obs) {

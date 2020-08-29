@@ -23,7 +23,7 @@
                 <ground implementation="rot_z_only" />
                 <kilobot_communication implementation="default" medium="kilomedium" show_rays="true"/>
             </sensors>
-            <params mean_walk_duration="50" observation_interval="1" prior="25" feedback="true"/>
+            <params mean_walk_duration="50" observation_interval="10" prior="25" feedback="true"/>
         </kilobot_bayesiandecision_controller>
 
     </controllers>
@@ -62,22 +62,6 @@
         <!-- <kilobot id="k_0">
             <body position="0,0.04,0" orientation="0,0,0" />
             <controller config="kbdc"/>
-        </kilobot>
-        <kilobot id="k_1">
-            <body position="0.06,0.01,0" orientation="0,0,0" />
-            <controller config="kbdc"/>
-        </kilobot> -->
-        <!-- <kilobot id="k_2">
-            <body position="-0.06,0,0" orientation="0,0,0" />
-            <controller config="kbdc"/>
-        </kilobot>
-        <kilobot id="k_3">
-            <body position="0.4,0.6,0" orientation="0,0,0" />
-            <controller config="kbdc"/>
-        </kilobot>
-        <kilobot id="k_4">
-            <body position="0.0,0.07,0" orientation="0,0,0" />
-            <controller config="kbdc"/>
         </kilobot> -->
 
         <distribute>
@@ -102,8 +86,7 @@
     <visualization>
         <qt-opengl>
             <camera>
-                <placement idx="0" position="0.214392,1.18232,0.114335" look_at="1.07745,1.61078,-0.153164" up="0.239598,0.118946,0.963558" lens_focal_length="20" />
-                <placement idx="1" position="0,0,2" look_at="0,0,0" up="0,1,0" lens_focal_length="20" />
+                <placement idx="0" position="0,0,2" look_at="0,0,0" up="0,1,0" lens_focal_length="20" />
             </camera>
         </qt-opengl>
     </visualization>

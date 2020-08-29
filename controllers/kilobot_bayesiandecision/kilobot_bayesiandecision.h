@@ -38,7 +38,8 @@ public:
 
    void Destroy() {}
 
-   void CheckGround();
+   void CheckGray();
+   void CheckBlackWhite();
 
    void Broadcast(SInt8 obs);
 
@@ -78,6 +79,10 @@ private:
 
     Real com_interval;
     Real com_timer;
+
+    Real floor_end_interval;
+    Real floor_end_timer;
+
 
     //parametros relacionados con las observaciones y el modelo estadistico de decision
     Real obs_interval;
