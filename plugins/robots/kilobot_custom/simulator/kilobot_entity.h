@@ -20,6 +20,7 @@ namespace argos {
 
 #include <argos3/core/simulator/entity/composable_entity.h>
 #include <argos3/plugins/simulator/entities/wheeled_entity.h>
+#include <argos3/core/utility/datatypes/color.h>
 
 
 namespace argos {
@@ -74,19 +75,24 @@ namespace argos {
          return *m_pcGroundSensorEquippedEntity;
       }
 
+      // inline CColor GetColor() {
+      //    return main_color;
+      // }
+
       virtual std::string GetTypeDescription() const {
          return "kilobot"; //TODO "kilobot_custom"
       }
 
    private:
+     // CColor main_color;
 
-      CControllableEntity*         m_pcControllableEntity;
-      CEmbodiedEntity*             m_pcEmbodiedEntity;
-      CLEDEquippedEntity*          m_pcLEDEquippedEntity;
-      CLightSensorEquippedEntity*  m_pcLightSensorEquippedEntity;
-      CKilobotCommunicationEntity* m_pcKilobotCommunicationEntity;
-      CWheeledEntity*              m_pcWheeledEntity;
-      CGroundSensorEquippedEntity* m_pcGroundSensorEquippedEntity;
+    CControllableEntity*         m_pcControllableEntity;
+    CEmbodiedEntity*             m_pcEmbodiedEntity;
+    CLEDEquippedEntity*          m_pcLEDEquippedEntity;
+    CLightSensorEquippedEntity*  m_pcLightSensorEquippedEntity;
+    CKilobotCommunicationEntity* m_pcKilobotCommunicationEntity;
+    CWheeledEntity*              m_pcWheeledEntity;
+    CGroundSensorEquippedEntity* m_pcGroundSensorEquippedEntity;
 
    };
 

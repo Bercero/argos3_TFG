@@ -32,8 +32,9 @@ public:
 
 private:
     //parametros pasados en el archivo de configuración
-    UInt32 grid_resolution_x;//numero de cuadrados en el eje x
     Real fill_ratio;
+    UInt32 grid_resolution_x;//numero de cuadrados en el eje x
+    Real margin;//profundidad del area gris que sirve de margen, en cm
 
     Real square_size;//tamaño de los cuadros de la cuadricula
     CRandom::CRNG* rng;
@@ -42,6 +43,8 @@ private:
     //para calcular las cordenadas del suelo partiendo desde una esquina en lugar
     // de desde el centro
     Real offset_x, offset_y;
+    //TODO comentar
+    Real limit_x, limit_y;
 
     std::vector<CKilobotBayesianDecision*> controllers;
 };

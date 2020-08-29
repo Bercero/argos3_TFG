@@ -20,7 +20,7 @@
 
 using namespace argos;
 
-enum MovingStates {KILOBOT_STATE_STOP, KILOBOT_STATE_TURNING, KILOBOT_STATE_MOVING};
+enum MovingStates {KILOBOT_STATE_STOP, KILOBOT_STATE_TURNING, KILOBOT_STATE_MOVING, KILOBOT_STATE_AVOIDING};
 
 class CKilobotBayesianDecision : public CCI_Controller {
 
@@ -38,19 +38,19 @@ public:
 
    void Destroy() {}
 
-   void Observe();
+   void CheckGround();
 
    void Broadcast(SInt8 obs);
 
    void PollMessages();
 
-   void static setIdNum(CKilobotBayesianDecision* robot);
 
    inline const SInt8 GetDecision() const {return decision;}
    inline const MovingStates GetCurrentState() const {return current_state;};
    inline const bool MovingStateChanged() const {return (previous_state != current_state);};
 
 private:
+    void static setIdNum(CKilobotBayesianDecision* robot);
     static UInt16 id_counter;
 
     CCI_DifferentialSteeringActuator* motors;
@@ -99,7 +99,6 @@ private:
     UInt32 ticks_per_second;
     UInt32 direction;
     SInt16 reading;
-    bool is_new;
     message_t* out_msg;
     CCI_KilobotCommunicationSensor::TPackets in_msgs;
     UInt8 * byte_ptr;

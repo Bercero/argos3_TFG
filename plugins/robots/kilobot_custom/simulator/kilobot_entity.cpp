@@ -22,6 +22,7 @@ namespace argos {
    /****************************************/
 
    CKilobotEntity::CKilobotEntity() :
+      // main_color(0,0,255),
       CComposableEntity(NULL),
       m_pcControllableEntity(NULL),
       m_pcEmbodiedEntity(NULL),
@@ -41,6 +42,7 @@ namespace argos {
                                   const CVector3& c_position,
                                   const CQuaternion& c_orientation,
                                   Real f_communication_range) :
+      // main_color(0,0,255),
       CComposableEntity(NULL, str_id),
       m_pcControllableEntity(NULL),
       m_pcEmbodiedEntity(NULL),
@@ -93,7 +95,7 @@ namespace argos {
          m_pcGroundSensorEquippedEntity->AddSensor(CVector2(0.0, 0.0),
                                                    CGroundSensorEquippedEntity::TYPE_BLACK_WHITE,
                                                    m_pcEmbodiedEntity->GetOriginAnchor());
-         m_pcGroundSensorEquippedEntity->AddSensor(CVector2(0.0, -0.01),
+         m_pcGroundSensorEquippedEntity->AddSensor(CVector2(0.0, 0.01),
                                                    CGroundSensorEquippedEntity::TYPE_GRAYSCALE,
                                                    m_pcEmbodiedEntity->GetOriginAnchor());
 
@@ -116,6 +118,7 @@ namespace argos {
 
    void CKilobotEntity::Init(TConfigurationNode& t_tree) {
       try {
+          // GetNodeAttributeOrDefault(t_tree,"color",main_color,main_color);
          /*
           * Init parent
           */
@@ -162,10 +165,10 @@ namespace argos {
          m_pcGroundSensorEquippedEntity =
             new CGroundSensorEquippedEntity(this, "ground_0");
          AddComponent(*m_pcGroundSensorEquippedEntity);
-         m_pcGroundSensorEquippedEntity->AddSensor(CVector2(0.0, 0.0),
+         m_pcGroundSensorEquippedEntity->AddSensor(KILOBOT_GROUND_SENSOR_0_OFFSET,
                                                    CGroundSensorEquippedEntity::TYPE_BLACK_WHITE,
                                                    m_pcEmbodiedEntity->GetOriginAnchor());
-         m_pcGroundSensorEquippedEntity->AddSensor(CVector2(0.0, -0.01),
+         m_pcGroundSensorEquippedEntity->AddSensor(KILOBOT_GROUND_SENSOR_1_OFFSET,
                                                    CGroundSensorEquippedEntity::TYPE_GRAYSCALE,
                                                    m_pcEmbodiedEntity->GetOriginAnchor());
 

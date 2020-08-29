@@ -13,6 +13,8 @@
 #include <argos3/core/utility/math/vector3.h>
 #include <argos3/plugins/simulator/entities/led_equipped_entity.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_widget.h>
+// #include <argos3/core/utility/datatypes/color.h>
+
 
 namespace argos {
 
@@ -127,7 +129,7 @@ namespace argos {
    /****************************************/
 
    void CQTOpenGLKilobot::SetCircuitBoardMaterial() {
-      const GLfloat pfColor[]     = { 0.0f, 1.0f, 0.0f, 1.0f };
+      const GLfloat pfColor[]     = { 1.0f, 1.0f, 0.0f, 1.0f };
       const GLfloat pfSpecular[]  = { 0.5f, 0.5f, 1.0f, 1.0f };
       const GLfloat pfShininess[] = { 10.0f                  };
       const GLfloat pfEmission[]  = { 0.0f, 0.0f, 0.0f, 1.0f };

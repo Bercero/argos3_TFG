@@ -38,7 +38,7 @@ namespace argos {
    static const Real KILOBOT_LIGHT_SENSOR_ELEVATION  = KILOBOT_HEIGHT;
    static const Real KILOBOT_LIGHT_SENSOR_RADIUS     = KILOBOT_RADIUS - 0.002;
    static const Real KILOBOT_LIGHT_SENSOR_RANGE      = 0.1;
-   static const CVector3 KILOBOT_LIGHT_SENSOR_OFFSET = 
+   static const CVector3 KILOBOT_LIGHT_SENSOR_OFFSET =
       CVector3(0.0,
                0.0,
                KILOBOT_LIGHT_SENSOR_ELEVATION) +
@@ -49,9 +49,17 @@ namespace argos {
                0.0,
                0.0);
 
+   /* Ground sensors */
+   static const CVector2 KILOBOT_GROUND_SENSOR_0_OFFSET =
+      CVector2(0.0,
+               0.0);
+   static const CVector2 KILOBOT_GROUND_SENSOR_1_OFFSET =
+      CVector2(KILOBOT_RADIUS,
+               0.0);
+
    /* Communication RAB */
    static const Real KILOBOT_RAB_ELEVATION          = KILOBOT_HEIGHT + 0.001;
-   
+
 
 
 }

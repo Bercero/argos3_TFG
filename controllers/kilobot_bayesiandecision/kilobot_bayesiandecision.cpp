@@ -83,28 +83,25 @@ void CKilobotBayesianDecision::Reset() {
     //TODO cambiar esto cuando detecten colisiones
     walking_steps = walking_steps % 3400;
 
-    // current_state = KILOBOT_STATE_MOVING;
-    current_state = KILOBOT_STATE_STOP;
+    current_state = KILOBOT_STATE_MOVING;
     previous_state = KILOBOT_STATE_MOVING;
     motor_L = motor_R = PIN_FORWARD;
     decision = -1;
     obs_index = 0;
 
     old_msgs.clear();
-    if(GetId()=="k_0")
-        leds->SetColor(CColor::RED);
+
 }
 
 /****************************************/
 /****************************************/
 
 void CKilobotBayesianDecision::ControlStep() {
-    if(decision == -1 && obs_timer-- <= 0){
-        Observe();
-        obs_timer = obs_interval;
-    }
-    //TODO iniciar el temporizador aletoriamente
-    if(obs_index > 0 && com_timer-- <= 0){
+
+    CheckGround();
+
+    //TODO iniciar el temporizador aletoriamente en init
+    if(obs_index > 0 && com_timer <= 0){
         if(feedback && decision != -1)
             Broadcast(decision);
         else
@@ -112,53 +109,88 @@ void CKilobotBayesianDecision::ControlStep() {
         com_timer = com_interval;
     }
     PollMessages();
+
     // paseo aleatorio
    // time, and rotate cw/ccw for a random amount of time
    // max rotation: 180 degrees as determined by max_turning_steps
-   previous_state = current_state;
-   switch(current_state) {
-   case KILOBOT_STATE_TURNING:
-      if( --turning_steps == 0 ) {
-         motor_L = motor_R = PIN_FORWARD;
-         walking_steps = rng->Exponential(mean_walk_duration) * ticks_per_second;
-         current_state = KILOBOT_STATE_MOVING;
-      }
-      break;
+    switch(current_state) {
 
-   case KILOBOT_STATE_MOVING:
-      if( --walking_steps == 0 ) {
-         direction = rng->Uniform(CRange<UInt32>(0,2));
-         if( direction == 0 ) {
-            motor_L = PIN_TURN;
-            motor_R = PIN_STOP;
-         }
-         else {
-            motor_L = PIN_STOP;
-            motor_R = PIN_TURN;
-         }
-         turning_steps = rng->Uniform(CRange<UInt32>(0,max_turning_steps));
-         current_state = KILOBOT_STATE_TURNING;
-      }
-      break;
+        case KILOBOT_STATE_TURNING:
+            if( --turning_steps == 0 ) {
+                motor_L = motor_R = PIN_FORWARD;
+                walking_steps = rng->Exponential(mean_walk_duration) * ticks_per_second;
+                previous_state = current_state;
+                current_state = KILOBOT_STATE_MOVING;
+            }
+        break;
+        case KILOBOT_STATE_AVOIDING:
+            if( --walking_steps == 0 ) {
+                direction = rng->Uniform(CRange<UInt32>(0,2));
+                if( direction == 0 ) {
+                    motor_L = PIN_TURN;
+                    motor_R = PIN_STOP;
+                }
+                else {
+                    motor_L = PIN_STOP;
+                    motor_R = PIN_TURN;
+                }
+                //Giro de al menos 90 grados
+                turning_steps = rng->Uniform(CRange<UInt32>(max_turning_steps/2 ,max_turning_steps));
+                previous_state = current_state;
+                current_state = KILOBOT_STATE_TURNING;
+                leds->SetColor(CColor::BLACK);
+            }
+        break;
+        case KILOBOT_STATE_MOVING:
+            if( --walking_steps == 0 ) {
+                direction = rng->Uniform(CRange<UInt32>(0,2));
+                if( direction == 0 ) {
+                    motor_L = PIN_TURN;
+                    motor_R = PIN_STOP;
+                }
+                else {
+                    motor_L = PIN_STOP;
+                    motor_R = PIN_TURN;
+                }
+                turning_steps = rng->Uniform(CRange<UInt32>(0,max_turning_steps));
+                previous_state = current_state;
+                current_state = KILOBOT_STATE_TURNING;
+            }
+        break;
 
-   case KILOBOT_STATE_STOP:
-   default:
-      motor_L = motor_R = PIN_STOP;
-      break;
+        case KILOBOT_STATE_STOP:
+        default:
+        motor_L = motor_R = PIN_STOP;
+        break;
    };
 
    motors->SetLinearVelocity(motor_L, motor_R);
+   obs_timer--;
+   com_timer--;
 }
 
 /****************************************/
 /****************************************/
-void CKilobotBayesianDecision::Observe() {
-    obs_index ++;
+void CKilobotBayesianDecision::CheckGround() {
     std::vector<Real> readings  = ground_sensors->GetReadings();
-    LOG<<GetId()<<" realiza observacion "<<obs_index <<std::endl;
-    last_obs = readings[0];
-
-    //calculatePosterior();
+    //detectando cuando si ha llegado al margen de la arena
+    if(current_state != KILOBOT_STATE_AVOIDING
+        && previous_state != KILOBOT_STATE_AVOIDING
+        && readings[1] > 0.1 && readings[1] < 0.9 ){
+        leds->SetColor(CColor::RED);
+        previous_state = current_state;
+        current_state = KILOBOT_STATE_AVOIDING;
+        walking_steps = 5 * ticks_per_second;
+        motor_L = motor_R = - PIN_FORWARD;
+    }
+    //comprobar si toca hacer observación
+    if(decision == -1 && obs_timer <= 0)
+    {
+        last_obs = readings[0];
+        obs_timer = obs_interval;
+        obs_index ++;
+        //calculatePosterior();
+    }
 }
 
 void CKilobotBayesianDecision::Broadcast(SInt8 obs) {
@@ -183,39 +215,45 @@ void CKilobotBayesianDecision::Broadcast(SInt8 obs) {
     out_msg->crc = 4;//TODO computar crc, no es necesario de momento, pero puede que cambiar al actualizarse el plugin de los kilobots
 
     com_tx->SetMessage(out_msg);
-    LOG<<GetId()<<" envia observacion"<< obs_index <<std::endl;
 
 }
 
 void CKilobotBayesianDecision::PollMessages(){
 
-    if(GetId() =="k_0"){
-        in_msgs = com_rx->GetPackets();
-        if(in_msgs.size() > 0){
-            LOG<<GetId()<<" recibe mensajes"<<std::endl;
-            for(UInt32 i = 0; i < in_msgs.size(); i++ ){
-                id_msg = (UInt16) in_msgs[i].Message->data[0];
-                obs_index_msg = (UInt32) in_msgs[i].Message->data[2];
-                obs_msg = in_msgs[i].Message->data[6];
+    in_msgs = com_rx->GetPackets();
+    if(in_msgs.size() > 0){
+        for(UInt32 i = 0; i < in_msgs.size(); i++ ){
+            id_msg = (UInt16) in_msgs[i].Message->data[0];
+            obs_index_msg = (UInt32) in_msgs[i].Message->data[2];
+            obs_msg = in_msgs[i].Message->data[6];
 
-                if(id_num != id_msg){
-
-                    //comprobando si es información nueva
-                    it = old_msgs.find(id_msg);
-                    if( it == old_msgs.end())
-                    {
-                        //inserta el mensaje
-                        old_msgs[id_msg] = obs_index_msg;
-                    }
-                    else if(it->second != obs_index_msg)
-                    {
-                        //actualiza el mensaje guardado con el nuevo indice de observacion
-                        it->second = obs_index_msg;
-                    }
-
+            if(id_num != id_msg){
+                //comprobando si es información nueva
+                it = old_msgs.find(id_msg);
+                if( it == old_msgs.end())
+                {
+                    //inserta el mensaje
+                    old_msgs[id_msg] = obs_index_msg;
+                    //calculatePosterior();
                 }
+                else if(it->second != obs_index_msg)
+                {
+                    //actualiza el mensaje guardado con el nuevo indice de observacion
+                    it->second = obs_index_msg;
+                    //calculatePosterior();
+                }
+
             }
-            // estimate_distance(& (in_msgs[i].Distance));
+            //detectando cuando si ha topado con otro kilobot
+            if(current_state != KILOBOT_STATE_AVOIDING &&
+                previous_state != KILOBOT_STATE_AVOIDING &&
+                estimate_distance(& (in_msgs[i].Distance)) < 50){
+                leds->SetColor(CColor::GREEN);
+                previous_state = current_state;
+                current_state = KILOBOT_STATE_AVOIDING;
+                walking_steps = 5 * ticks_per_second;
+                motor_L = motor_R = - PIN_FORWARD;
+            }
         }
     }
 }
