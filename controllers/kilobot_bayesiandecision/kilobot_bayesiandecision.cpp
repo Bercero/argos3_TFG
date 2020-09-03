@@ -13,26 +13,31 @@ UInt16 CKilobotBayesianDecision::id_counter = 0;
 CKilobotBayesianDecision::CKilobotBayesianDecision() :
    motors(NULL),
    leds(NULL),
-   // light_sensor(NULL),
+   ground_sensors(NULL),
+   com_rx(NULL),
+   com_tx(NULL),
    current_state(KILOBOT_STATE_STOP),
    previous_state(KILOBOT_STATE_STOP),
+   mean_walk_duration(240),
    max_turning_steps(50),
+   walking_steps(1),
    turning_steps(1),
-   decision(-1),
    motor_L(0.0f),
    motor_R(0.0f),
-   obs_index(0),
-   walking_steps(0),
-   mean_walk_duration(240),
    obs_interval(300),
-   com_interval(0.5),
-   floor_end_interval(0.5),
    obs_timer(0),
+   com_interval(0.5),
    com_timer(0),
+   floor_end_interval(0.5),
    floor_end_timer(0),
-   prior(25),
+   credible_threshold(0.9),
+   prior(1),
    feedback(true),
-   last_obs(-1)
+   decision(-1),
+   obs_index(0),
+   last_obs(-1),
+   w_obs(prior),
+   b_obs(prior)
 {
    rng = CRandom::CreateRNG( "argos" );
    out_msg = new message_t;
@@ -57,21 +62,23 @@ void CKilobotBayesianDecision::Init(TConfigurationNode& t_node) {
     // max_turning_steps = 2 * ticks_per_second; // (pi / PIN_TURN)*ticks_per_second -> media vuelta
     max_turning_steps = 5*ticks_per_second; // TODO no entiendo por que es 5
 
-
-    GetNodeAttributeOrDefault(t_node, "observation_interval", obs_interval, obs_interval);
-    GetNodeAttributeOrDefault(t_node, "broadcast_interval", com_interval, com_interval);
-    GetNodeAttributeOrDefault(t_node, "avoidance_interval", floor_end_interval, floor_end_interval);
-    obs_interval *= ticks_per_second;
-    com_interval *= ticks_per_second;
-    floor_end_interval *= ticks_per_second;
-    GetNodeAttributeOrDefault(t_node, "mean_walk_duration", mean_walk_duration, mean_walk_duration);
-    GetNodeAttributeOrDefault(t_node, "prior", prior, prior);
-    GetNodeAttributeOrDefault(t_node, "feedback", feedback, feedback);
-
     //TODO comprobar parametros de configuración
     // if( tal y cual) {
     //    LOGERR << "[FATAL] Invalid value for num_moving_steps (" << m_unMaxMotionSteps << "). Should be a positive integer." << std::endl;
     // }
+
+    GetNodeAttributeOrDefault(t_node, "observation_interval", obs_interval, obs_interval);
+    obs_interval *= ticks_per_second;
+    GetNodeAttributeOrDefault(t_node, "broadcast_interval", com_interval, com_interval);
+    com_interval *= ticks_per_second;
+    GetNodeAttributeOrDefault(t_node, "avoidance_interval", floor_end_interval, floor_end_interval);
+    floor_end_interval *= ticks_per_second;
+    GetNodeAttributeOrDefault(t_node, "mean_walk_duration", mean_walk_duration, mean_walk_duration);
+    GetNodeAttributeOrDefault(t_node, "prior", prior, prior);
+    GetNodeAttributeOrDefault(t_node, "feedback", feedback, feedback);
+    GetNodeAttributeOrDefault(t_node, "credible_threshold", credible_threshold, credible_threshold);
+
+
 
     Reset();
 }
@@ -93,6 +100,7 @@ void CKilobotBayesianDecision::Reset() {
     motor_L = motor_R = PIN_FORWARD;
     decision = -1;
     obs_index = 0;
+    w_obs = b_obs = prior;
 
     old_msgs.clear();
 
@@ -113,17 +121,17 @@ void CKilobotBayesianDecision::ControlStep() {
     {
         CheckBlackWhite();
         obs_timer = obs_interval;
-        //calculatePosterior();
     }
 
+    //enviar ultima observacion a los robots vecinos
     if(obs_index > 0 && --com_timer <= 0){
         if(feedback && decision != -1)
             Broadcast(decision);
         else
             Broadcast(last_obs);
         com_timer = com_interval;
-        LOG<<GetId()<<std::endl;
     }
+
     PollMessages();
 
     // paseo aleatorio
@@ -154,7 +162,6 @@ void CKilobotBayesianDecision::ControlStep() {
                 turning_steps = rng->Uniform(CRange<UInt32>(max_turning_steps/2 ,max_turning_steps));
                 previous_state = current_state;
                 current_state = KILOBOT_STATE_TURNING;
-                leds->SetColor(CColor::BLACK);
             }
         break;
         case KILOBOT_STATE_MOVING:
@@ -187,7 +194,7 @@ void CKilobotBayesianDecision::ControlStep() {
 /****************************************/
 void CKilobotBayesianDecision::CheckGray() {
     std::vector<Real> readings  = ground_sensors->GetReadings();
-    //detectando cuando si ha llegado al margen de la arena
+    //detectando si ha llegado al margen de la arena
     if(current_state != KILOBOT_STATE_AVOIDING
         && previous_state != KILOBOT_STATE_AVOIDING
         && readings[1] > 0.1 && readings[1] < 0.9 ){
@@ -195,7 +202,7 @@ void CKilobotBayesianDecision::CheckGray() {
         previous_state = current_state;
         current_state = KILOBOT_STATE_AVOIDING;
         walking_steps = 5 * ticks_per_second;
-        motor_L = motor_R = - PIN_FORWARD;
+        motor_L = motor_R = - PIN_FORWARD;//marcha atras
     }
 }
 
@@ -203,6 +210,7 @@ void CKilobotBayesianDecision::CheckBlackWhite() {
     std::vector<Real> readings  = ground_sensors->GetReadings();
     last_obs = readings[0];
     obs_index ++;
+    AddObservation(last_obs);
 }
 
 void CKilobotBayesianDecision::Broadcast(SInt8 obs) {
@@ -233,34 +241,40 @@ void CKilobotBayesianDecision::Broadcast(SInt8 obs) {
 void CKilobotBayesianDecision::PollMessages(){
 
     in_msgs = com_rx->GetPackets();
-    if(in_msgs.size() > 0){
+    if(in_msgs.size() > 0)
+    {
+
         for(UInt32 i = 0; i < in_msgs.size(); i++ ){
-            id_msg = (UInt16) in_msgs[i].Message->data[0];
-            obs_index_msg = (UInt32) in_msgs[i].Message->data[2];
-            obs_msg = in_msgs[i].Message->data[6];
+            if(decision == -1)
+            {
+                id_msg = (UInt16) in_msgs[i].Message->data[0];
+                obs_index_msg = (UInt32) in_msgs[i].Message->data[2];
+                obs_msg = in_msgs[i].Message->data[6];
 
-            if(id_num != id_msg){
-                //comprobando si es información nueva
-                it = old_msgs.find(id_msg);
-                if( it == old_msgs.end())
-                {
-                    //inserta el mensaje
-                    old_msgs[id_msg] = obs_index_msg;
-                    //calculatePosterior();
-                }
-                else if(it->second != obs_index_msg)
-                {
-                    //actualiza el mensaje guardado con el nuevo indice de observacion
-                    it->second = obs_index_msg;
-                    //calculatePosterior();
-                }
+                if(id_num != id_msg){
+                    //comprobando si es información nueva
+                    it = old_msgs.find(id_msg);
+                    if( it == old_msgs.end())
+                    {
+                        //inserta el mensaje
+                        old_msgs[id_msg] = obs_index_msg;
+                        AddObservation(obs_msg);
+                    }
+                    else if(it->second != obs_index_msg)
+                    {
+                        //actualiza el mensaje guardado con el nuevo indice de observacion
+                        it->second = obs_index_msg;
+                        AddObservation(obs_msg);
+                    }
 
+                }
             }
             //detectando cuando si ha topado con otro kilobot
             if(current_state != KILOBOT_STATE_AVOIDING &&
                 previous_state != KILOBOT_STATE_AVOIDING &&
-                estimate_distance(& (in_msgs[i].Distance)) < 50){
-                leds->SetColor(CColor::GREEN);
+                estimate_distance(& (in_msgs[i].Distance)) < 50)
+            {
+                // leds->SetColor(CColor::BLUE);
                 previous_state = current_state;
                 current_state = KILOBOT_STATE_AVOIDING;
                 walking_steps = 5 * ticks_per_second;
@@ -268,6 +282,28 @@ void CKilobotBayesianDecision::PollMessages(){
             }
         }
     }
+}
+
+void CKilobotBayesianDecision::AddObservation(SInt8 obs){
+    w_obs += obs;
+    b_obs += (1 -obs);
+    p = cdf( beta_distribution<>(w_obs, b_obs), 0.5);
+
+    if (p >= credible_threshold){
+        decision = 0;
+        LOG<<GetId()<<"decide NEGRO ";
+        LOG<<" white:"<<w_obs<<" black:"<<b_obs;
+        LOG<<"p = "<< p<<std::endl;
+        leds->SetColor(CColor::RED);
+    }
+    else if ((1 -p) >= credible_threshold){
+        decision = 1;
+        LOG<<GetId()<<"decide BLANCO ";
+        LOG<<" white:"<<w_obs<<" black:"<<b_obs;
+        LOG<<"p = "<< p<<std::endl;
+        leds->SetColor(CColor::GREEN);
+    }
+
 }
 void CKilobotBayesianDecision::setIdNum(CKilobotBayesianDecision* robot){
     robot->id_num = id_counter ++;

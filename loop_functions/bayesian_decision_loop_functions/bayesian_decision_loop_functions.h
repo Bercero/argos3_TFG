@@ -47,6 +47,8 @@ private:
     Real limit_x, limit_y;
 
     std::vector<CKilobotBayesianDecision*> controllers;
+    UInt32 w_decision, b_decision;
+    SInt8 decision_i;
 };
 
 #endif

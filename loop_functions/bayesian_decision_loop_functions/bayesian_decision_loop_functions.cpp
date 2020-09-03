@@ -63,15 +63,23 @@ void CBayesianDecisionLoopFunctions::Init(TConfigurationNode& t_tree) {
 void CBayesianDecisionLoopFunctions::Reset() {
     // rng->Reset();//TODO Parece que no es necesario
     //TODO Tampoco parece necesario regenerar el vector de robots entre reinicios
+    LOG<<"f = "<<fill_ratio<<"\n";
 }
 
 bool CBayesianDecisionLoopFunctions::IsExperimentFinished() {
+    w_decision = 0;
     for(UInt32 i = 0; i < controllers.size(); i++){
-        if( controllers[i]->GetDecision()== -1)
+        decision_i = controllers[i]->GetDecision();
+        if( decision_i == -1)
             return false;
-
+        w_decision += decision_i;
     }
     LOG<<"Experimento finalizado: Todos los robots han tomado una decision\n";
+    b_decision = controllers.size() - w_decision;
+    LOG<<"f = "<<fill_ratio<<"\n";
+    LOG<<"decision w = "<<w_decision<<"\n";
+    LOG<<"decision b = "<<b_decision<<"\n";
+
     return true;
 }
 

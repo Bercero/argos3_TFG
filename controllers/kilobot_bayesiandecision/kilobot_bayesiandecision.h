@@ -15,10 +15,14 @@
 #include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_communication_sensor.h>
 #include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_communication_actuator.h>
 #include <argos3/core/utility/logging/argos_log.h>
+#include <boost/math/distributions/beta.hpp>
+
 // #include <argos3/plugins/robots/kilobot/control_interface/message_crc.h>
 
 
 using namespace argos;
+using boost::math::beta_distribution;
+using boost::math::cdf;
 
 enum MovingStates {KILOBOT_STATE_STOP, KILOBOT_STATE_TURNING, KILOBOT_STATE_MOVING, KILOBOT_STATE_AVOIDING};
 
@@ -45,18 +49,20 @@ public:
 
    void PollMessages();
 
+   void AddObservation(SInt8 obs);
 
    inline const SInt8 GetDecision() const {return decision;}
    inline const MovingStates GetCurrentState() const {return current_state;};
    inline const bool MovingStateChanged() const {return (previous_state != current_state);};
 
 private:
+    //metodo para asignar un id numerico unico, mas conveniente que la cadena de caracteres para
+    //el ancho de banda limitado a 9 bytes de los kylobots
     void static setIdNum(CKilobotBayesianDecision* robot);
     static UInt16 id_counter;
 
     CCI_DifferentialSteeringActuator* motors;
     CCI_KilobotLEDActuator* leds;
-    // CCI_KilobotLightSensor* light_sensor;
     CCI_GroundSensor* ground_sensors;
     CCI_KilobotCommunicationSensor * com_rx;
     CCI_KilobotCommunicationActuator* com_tx;
@@ -77,21 +83,21 @@ private:
     Real   motor_L;
     Real   motor_R;
 
-    Real com_interval;
-    Real com_timer;
+    //parametros que regulan el ritmo al que se producen las acciones
+    Real obs_interval, obs_timer;
+    Real com_interval, com_timer;
+    Real floor_end_interval, floor_end_timer;
 
-    Real floor_end_interval;
-    Real floor_end_timer;
+    //parametros relacionados con el modelo estadistico de decision
+    Real credible_threshold; // umbral de credibilidad
+    Real prior; //regularizing prior, sesgo inicial de la distribucion beta
 
+    bool feedback;
+    SInt8 decision;
 
-    //parametros relacionados con las observaciones y el modelo estadistico de decision
-    Real obs_interval;
-    Real obs_timer;
     UInt32 obs_index;
     SInt8 last_obs;
-    SInt8 decision;
-    Real prior;
-    bool feedback;
+    Real w_obs, b_obs; //observaciones
 
     //diccionario para saber cual es la ultima observacion recibida de cada robot
     std::map<UInt16, UInt32> old_msgs;
@@ -111,6 +117,7 @@ private:
     UInt32 obs_index_msg;
     UInt8 obs_msg;
     std::map<UInt16, UInt32>::iterator it;
+    Real p;
 
     UInt16 id_num;
 

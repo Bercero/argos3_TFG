@@ -23,7 +23,7 @@
                 <ground implementation="rot_z_only" />
                 <kilobot_communication implementation="default" medium="kilomedium" show_rays="true"/>
             </sensors>
-            <params mean_walk_duration="50" observation_interval="10" prior="25" feedback="true"/>
+            <params mean_walk_duration="50" observation_interval="30" prior="50" feedback="true" credible_threshold="0.9"/>
         </kilobot_bayesiandecision_controller>
 
     </controllers>
@@ -37,7 +37,7 @@
     <loop_functions
         library="build/loop_functions/bayesian_decision_loop_functions/libbayesian_decision_loop_functions"
         label="bayesian_decision_loop_functions">
-        <params fill_ratio="0.5" grid_resolution="10" margin="5"/>
+        <params fill_ratio="0.6" grid_resolution="10" margin="5"/>
     </loop_functions>
 
 
@@ -59,10 +59,6 @@
             </box>
 
         <!-- instacia los robots -->
-        <!-- <kilobot id="k_0">
-            <body position="0,0.04,0" orientation="0,0,0" />
-            <controller config="kbdc"/>
-        </kilobot> -->
 
         <distribute>
             <position method="uniform" min="-1.10,-1.10,0" max="1.10,1.10,0" />
@@ -73,6 +69,13 @@
                 </kilobot>
             </entity>
         </distribute>
+
+
+        <!-- <kilobot id="k_0">
+            <body position="0,0.04,0" orientation="0,0,0" />
+            <controller config="kbdc"/>
+        </kilobot> -->
+
     </arena>
 
     <physics_engines>
