@@ -30,7 +30,8 @@ namespace argos {
    static const Real KILOBOT_PIN_WHEEL_RADIUS       = 0.001;
    static const CRadians KILOBOT_LED_ANGLE          = CRadians(ARGOS_PI / 6.0);
    static const Real KILOBOT_LED_ELEVATION          = KILOBOT_HEIGHT;
-   static const Real KILOBOT_LED_RADIUS             = KILOBOT_RADIUS * 0.25;
+   // static const Real KILOBOT_LED_RADIUS             = KILOBOT_RADIUS * 0.25;
+   static const Real KILOBOT_LED_RADIUS             = KILOBOT_RADIUS * 0.4;
    static const Real KILOBOT_LED_HEIGHT             = KILOBOT_RADIUS * 0.05;
 
    /* Light Sensor */

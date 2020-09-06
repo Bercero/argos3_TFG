@@ -92,8 +92,7 @@ void CKilobotBayesianDecision::Reset() {
     com_timer = rng->Uniform(CRange<UInt32>(1, (UInt32) com_interval));
     //TODO el parametro del experimento original parece ser demasiado aqui
     walking_steps = rng->Exponential(mean_walk_duration) * ticks_per_second;
-    //TODO cambiar esto cuando detecten colisiones
-    walking_steps = walking_steps % 3400;
+    // walking_steps = walking_steps % 3400;
 
     current_state = KILOBOT_STATE_MOVING;
     previous_state = KILOBOT_STATE_MOVING;
@@ -103,7 +102,7 @@ void CKilobotBayesianDecision::Reset() {
     w_obs = b_obs = prior;
 
     old_msgs.clear();
-
+    leds->SetColor(CColor::PURPLE);
 }
 
 /****************************************/
@@ -198,7 +197,6 @@ void CKilobotBayesianDecision::CheckGray() {
     if(current_state != KILOBOT_STATE_AVOIDING
         && previous_state != KILOBOT_STATE_AVOIDING
         && readings[1] > 0.1 && readings[1] < 0.9 ){
-        leds->SetColor(CColor::RED);
         previous_state = current_state;
         current_state = KILOBOT_STATE_AVOIDING;
         walking_steps = 5 * ticks_per_second;
@@ -208,9 +206,11 @@ void CKilobotBayesianDecision::CheckGray() {
 
 void CKilobotBayesianDecision::CheckBlackWhite() {
     std::vector<Real> readings  = ground_sensors->GetReadings();
-    last_obs = readings[0];
-    obs_index ++;
-    AddObservation(last_obs);
+    if(readings[1] < 0.1 || readings[1] > 0.9 ){
+        last_obs = readings[0];
+        obs_index ++;
+        AddObservation(last_obs);
+    }
 }
 
 void CKilobotBayesianDecision::Broadcast(SInt8 obs) {
@@ -293,14 +293,14 @@ void CKilobotBayesianDecision::AddObservation(SInt8 obs){
         decision = 0;
         LOG<<GetId()<<"decide NEGRO ";
         LOG<<" white:"<<w_obs<<" black:"<<b_obs;
-        LOG<<"p = "<< p<<std::endl;
+        LOG<<" p = "<< p<<std::endl;
         leds->SetColor(CColor::RED);
     }
     else if ((1 -p) >= credible_threshold){
         decision = 1;
         LOG<<GetId()<<"decide BLANCO ";
-        LOG<<" white:"<<w_obs<<" black:"<<b_obs;
-        LOG<<"p = "<< p<<std::endl;
+        LOG<<" white: "<<w_obs<<" black: "<<b_obs;
+        LOG<<" p = "<< p<<std::endl;
         leds->SetColor(CColor::GREEN);
     }
 

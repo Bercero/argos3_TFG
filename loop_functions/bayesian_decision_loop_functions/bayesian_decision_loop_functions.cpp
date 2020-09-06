@@ -76,6 +76,9 @@ bool CBayesianDecisionLoopFunctions::IsExperimentFinished() {
     }
     LOG<<"Experimento finalizado: Todos los robots han tomado una decision\n";
     b_decision = controllers.size() - w_decision;
+
+    LOG<<"k = "<<controllers.size()<<"\n";
+    LOG<<"grid_resolution = "<<grid_resolution_x<<"\n";
     LOG<<"f = "<<fill_ratio<<"\n";
     LOG<<"decision w = "<<w_decision<<"\n";
     LOG<<"decision b = "<<b_decision<<"\n";
