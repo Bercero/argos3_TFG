@@ -88,22 +88,20 @@ void CFootBotLamb::ControlStep() {
     */
     CRadians cAngle = cAccumulator.Angle();
 
-    //TODO Esto lo comento para que no se muevan en esta prueba
-
-    // if(m_cGoStraightAngleRange.WithinMinBoundIncludedMaxBoundIncluded(cAngle) &&
-    //   cAccumulator.Length() < m_fDelta ) {
-    //   /* Go straight */
-    //   m_pcWheels->SetLinearVelocity(m_fWheelVelocity, m_fWheelVelocity);
-    // }
-    // else {
-    //   /* Turn, depending on the sign of the angle */
-    //   if(cAngle.GetValue() > 0.0f) {
-    //      m_pcWheels->SetLinearVelocity(m_fWheelVelocity, 0.0f);
-    //   }
-    //   else {
-    //      m_pcWheels->SetLinearVelocity(0.0f, m_fWheelVelocity);
-    //   }
-    // }
+    if(m_cGoStraightAngleRange.WithinMinBoundIncludedMaxBoundIncluded(cAngle) &&
+      cAccumulator.Length() < m_fDelta ) {
+      /* Go straight */
+      m_pcWheels->SetLinearVelocity(m_fWheelVelocity, m_fWheelVelocity);
+    }
+    else {
+      /* Turn, depending on the sign of the angle */
+      if(cAngle.GetValue() > 0.0f) {
+         m_pcWheels->SetLinearVelocity(m_fWheelVelocity, 0.0f);
+      }
+      else {
+         m_pcWheels->SetLinearVelocity(0.0f, m_fWheelVelocity);
+      }
+    }
 
     //FIXME pone a 0 el mensaje, es un apaño,
     //pero no soy capaz de que deje de enviarse en cada step
