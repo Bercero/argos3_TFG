@@ -16,9 +16,9 @@ add_definitions(-DARGOS_${ARGOS_BUILD_FOR}_BUILD)
 # Create a convenience variable for checks in the CMake files
 if(ARGOS_BUILD_FOR STREQUAL "simulator")
   set(ARGOS_BUILD_FOR_SIMULATOR TRUE)
-else(ARGOS_BUILD_FOR STREQUAL "simulator")
+else()
   set(ARGOS_BUILD_FOR_SIMULATOR FALSE)
-endif(ARGOS_BUILD_FOR STREQUAL "simulator")
+endif()
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
@@ -29,4 +29,4 @@ endif()
 #
 if(NOT DEFINED ARGOS_BUILD_NATIVE)
   option(ARGOS_BUILD_NATIVE "ON -> compile with platform-specific optimizations, OFF -> compile to portable binary" OFF)
-endif(NOT DEFINED ARGOS_BUILD_NATIVE)
+endif()

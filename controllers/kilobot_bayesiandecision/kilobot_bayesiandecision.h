@@ -58,7 +58,7 @@ public:
 private:
     //metodo para asignar un id numerico unico, mas conveniente que la cadena de caracteres para
     //el ancho de banda limitado a 9 bytes de los kylobots
-    void static setIdNum(CKilobotBayesianDecision* robot);
+    void static SetIdNum(CKilobotBayesianDecision* robot);
     static UInt16 id_counter;
 
     CCI_DifferentialSteeringActuator* motors;

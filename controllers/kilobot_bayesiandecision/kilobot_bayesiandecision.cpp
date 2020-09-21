@@ -41,7 +41,7 @@ CKilobotBayesianDecision::CKilobotBayesianDecision() :
 {
    rng = CRandom::CreateRNG( "argos" );
    out_msg = new message_t;
-   CKilobotBayesianDecision::setIdNum(this);
+   CKilobotBayesianDecision::SetIdNum(this);
 }
 
 /****************************************/
@@ -59,8 +59,7 @@ void CKilobotBayesianDecision::Init(TConfigurationNode& t_node) {
     TConfigurationNode experiment_conf = GetNode(CSimulator::GetInstance().GetConfigurationRoot(), "framework");
     experiment_conf = GetNode(experiment_conf,"experiment");
     GetNodeAttribute(experiment_conf, "ticks_per_second", ticks_per_second);
-    // max_turning_steps = 2 * ticks_per_second; // (pi / PIN_TURN)*ticks_per_second -> media vuelta
-    max_turning_steps = 5*ticks_per_second; // TODO no entiendo por que es 5
+    max_turning_steps = 5 * ticks_per_second;
 
     //TODO comprobar parametros de configuración
     // if( tal y cual) {
@@ -74,6 +73,7 @@ void CKilobotBayesianDecision::Init(TConfigurationNode& t_node) {
     GetNodeAttributeOrDefault(t_node, "avoidance_interval", floor_end_interval, floor_end_interval);
     floor_end_interval *= ticks_per_second;
     GetNodeAttributeOrDefault(t_node, "mean_walk_duration", mean_walk_duration, mean_walk_duration);
+    mean_walk_duration *= ticks_per_second;
     GetNodeAttributeOrDefault(t_node, "prior", prior, prior);
     GetNodeAttributeOrDefault(t_node, "feedback", feedback, feedback);
     GetNodeAttributeOrDefault(t_node, "credible_threshold", credible_threshold, credible_threshold);
@@ -92,7 +92,6 @@ void CKilobotBayesianDecision::Reset() {
     com_timer = rng->Uniform(CRange<UInt32>(1, (UInt32) com_interval));
     //TODO el parametro del experimento original parece ser demasiado aqui
     walking_steps = rng->Exponential(mean_walk_duration) * ticks_per_second;
-    // walking_steps = walking_steps % 3400;
 
     current_state = KILOBOT_STATE_MOVING;
     previous_state = KILOBOT_STATE_MOVING;
@@ -132,22 +131,21 @@ void CKilobotBayesianDecision::ControlStep() {
     }
 
     PollMessages();
-
     // paseo aleatorio
    // time, and rotate cw/ccw for a random amount of time
    // max rotation: 180 degrees as determined by max_turning_steps
     switch(current_state) {
 
         case KILOBOT_STATE_TURNING:
-            if( --turning_steps == 0 ) {
+            if( --turning_steps <= 0 ) {
                 motor_L = motor_R = PIN_FORWARD;
-                walking_steps = rng->Exponential(mean_walk_duration) * ticks_per_second;
+                walking_steps = rng->Exponential(mean_walk_duration);
                 previous_state = current_state;
                 current_state = KILOBOT_STATE_MOVING;
             }
         break;
         case KILOBOT_STATE_AVOIDING:
-            if( --walking_steps == 0 ) {
+            if( --walking_steps <= 0 ) {
                 direction = rng->Uniform(CRange<UInt32>(0,2));
                 if( direction == 0 ) {
                     motor_L = PIN_TURN;
@@ -164,7 +162,7 @@ void CKilobotBayesianDecision::ControlStep() {
             }
         break;
         case KILOBOT_STATE_MOVING:
-            if( --walking_steps == 0 ) {
+            if( --walking_steps <= 0 ) {
                 direction = rng->Uniform(CRange<UInt32>(0,2));
                 if( direction == 0 ) {
                     motor_L = PIN_TURN;
@@ -305,7 +303,7 @@ void CKilobotBayesianDecision::AddObservation(SInt8 obs){
     }
 
 }
-void CKilobotBayesianDecision::setIdNum(CKilobotBayesianDecision* robot){
+void CKilobotBayesianDecision::SetIdNum(CKilobotBayesianDecision* robot){
     robot->id_num = id_counter ++;
 }
 /*
