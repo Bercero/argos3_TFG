@@ -1,5 +1,5 @@
-#ifndef KILOBOT_BAYESIANDECISION_H
-#define KILOBOT_BAYESIANDECISION_H
+#ifndef KILOBOT_FORMATION_H
+#define KILOBOT_FORMATION_H
 
 #include <map>
 
@@ -26,13 +26,13 @@ using boost::math::cdf;
 
 enum MovingStates {KILOBOT_STATE_STOP, KILOBOT_STATE_TURNING, KILOBOT_STATE_MOVING, KILOBOT_STATE_AVOIDING};
 
-class CKilobotBayesianDecision : public CCI_Controller {
+class CKilobotFormation : public CCI_Controller {
 
 public:
 
-    CKilobotBayesianDecision();
+    CKilobotFormation();
 
-    virtual ~CKilobotBayesianDecision() {}
+    virtual ~CKilobotFormation() {}
 
     void Init(TConfigurationNode& t_node);
 
@@ -42,28 +42,20 @@ public:
 
     void Destroy() {}
 
-    void CheckGray();
-    void CheckBlackWhite();
-
-    void Broadcast(SInt8 obs);
-
-    void PollMessages();
-
-    void AddObservation(SInt8 obs);
-
-    inline const SInt8 GetDecision() const {return decision;}
     inline const MovingStates GetCurrentState() const {return current_state;};
     inline const bool MovingStateChanged() const {return (previous_state != current_state);};
 
 private:
     //metodo para asignar un id numerico unico, mas conveniente que la cadena de caracteres para
     //el ancho de banda limitado a 9 bytes de los kylobots
-    void static SetIdNum(CKilobotBayesianDecision* robot);
+    void static SetIdNum(CKilobotFormation* robot);
     static UInt16 id_counter;
+    UInt16 id_num;
+    
 
     CCI_DifferentialSteeringActuator* motors;
     CCI_KilobotLEDActuator* leds;
-    CCI_GroundSensor* ground_sensors;
+    // CCI_GroundSensor* ground_sensors;
     CCI_KilobotCommunicationSensor * com_rx;
     CCI_KilobotCommunicationActuator* com_tx;
 
@@ -83,24 +75,6 @@ private:
     Real   motor_L;
     Real   motor_R;
 
-    //parametros que regulan el ritmo al que se producen las acciones
-    Real obs_interval, obs_timer;
-    Real com_interval, com_timer;
-    Real floor_end_interval, floor_end_timer;
-
-    //parametros relacionados con el modelo estadistico de decision
-    Real credible_threshold; // umbral de credibilidad
-    Real prior; //regularizing prior, sesgo inicial de la distribucion beta
-
-    bool feedback;
-    SInt8 decision;
-
-    UInt32 obs_index;
-    SInt8 last_obs;
-    Real w_obs, b_obs; //observaciones
-
-    //diccionario para saber cual es la ultima observacion recibida de cada robot
-    std::map<UInt16, UInt32> old_msgs;
 
     /* Generador de números aleatorios */
     CRandom::CRNG*  rng;
@@ -109,17 +83,6 @@ private:
     //se llama a esos metodos repetidamente
     UInt32 ticks_per_second;
     UInt32 direction;
-    SInt16 reading;
-    message_t* out_msg;
-    CCI_KilobotCommunicationSensor::TPackets in_msgs;
-    UInt8 * byte_ptr;
-    UInt16 id_msg;
-    UInt32 obs_index_msg;
-    UInt8 obs_msg;
-    std::map<UInt16, UInt32>::iterator it;
-    Real p;
-
-    UInt16 id_num;
 
     //TODO ordernar atributos
 

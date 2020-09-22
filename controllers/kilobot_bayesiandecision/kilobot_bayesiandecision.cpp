@@ -1,8 +1,5 @@
 #include "kilobot_bayesiandecision.h"
 
-/****************************************/
-/****************************************/
-
 //velocidades para asignar a los motores
 #define PIN_FORWARD 1.0f;
 #define PIN_TURN    1.57f;
@@ -91,7 +88,7 @@ void CKilobotBayesianDecision::Reset() {
     floor_end_timer = floor_end_interval;
     com_timer = rng->Uniform(CRange<UInt32>(1, (UInt32) com_interval));
     //TODO el parametro del experimento original parece ser demasiado aqui
-    walking_steps = rng->Exponential(mean_walk_duration) * ticks_per_second;
+    walking_steps = rng->Exponential(mean_walk_duration);
 
     current_state = KILOBOT_STATE_MOVING;
     previous_state = KILOBOT_STATE_MOVING;
