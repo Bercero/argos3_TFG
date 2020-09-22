@@ -5,12 +5,12 @@
  * @author Vito Trianni - <vito.trianni@istc.cnr.it>
  */
 
-#ifndef QTOPENGL_KILOBOT_H
-#define QTOPENGL_KILOBOT_H
+#ifndef QTOPENGL_KILOBOT_CUSTOM_H
+#define QTOPENGL_KILOBOT_CUSTOM_H
 
 namespace argos {
-   class CQTOpenGLKilobot;
-   class CKilobotEntity;
+   class CQTOpenGLKilobotCustom;
+   class CKilobotCustomEntity;
 }
 
 #ifdef __APPLE__
@@ -21,15 +21,15 @@ namespace argos {
 
 namespace argos {
 
-   class CQTOpenGLKilobot {
+   class CQTOpenGLKilobotCustom {
 
    public:
 
-      CQTOpenGLKilobot();
+      CQTOpenGLKilobotCustom();
 
-      virtual ~CQTOpenGLKilobot();
+      virtual ~CQTOpenGLKilobotCustom();
 
-      virtual void Draw(CKilobotEntity& c_entity);
+      virtual void Draw(CKilobotCustomEntity& c_entity);
 
    protected:
 

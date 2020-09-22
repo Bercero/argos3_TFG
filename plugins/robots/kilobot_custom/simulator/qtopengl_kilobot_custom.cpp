@@ -5,9 +5,9 @@
  * @author Vito Trianni - <vito.trianni@istc.cnr.it>
  */
 
-#include "qtopengl_kilobot.h"
+#include "qtopengl_kilobot_custom.h"
 #include "kilobot_measures.h"
-#include "kilobot_entity.h"
+#include "kilobot_custom_entity.h"
 #include <argos3/core/simulator/entity/embodied_entity.h>
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/vector3.h>
@@ -27,7 +27,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CQTOpenGLKilobot::CQTOpenGLKilobot() :
+   CQTOpenGLKilobotCustom::CQTOpenGLKilobotCustom() :
       m_unVertices(40) {
       /* Reserve the needed display lists */
       m_unLists = glGenLists(4);
@@ -62,14 +62,14 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CQTOpenGLKilobot::~CQTOpenGLKilobot() {
+   CQTOpenGLKilobotCustom::~CQTOpenGLKilobotCustom() {
       glDeleteLists(m_unLists, 4);
    }
 
    /****************************************/
    /****************************************/
 
-   void CQTOpenGLKilobot::Draw(CKilobotEntity& c_entity) {
+   void CQTOpenGLKilobotCustom::Draw(CKilobotCustomEntity& c_entity) {
       /* Place the pins */
       glPushMatrix();
       glTranslatef(KILOBOT_FRONT_PIN_DISTANCE, 0.0, 0.0f);
@@ -100,7 +100,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CQTOpenGLKilobot::SetWhitePlasticMaterial() {
+   void CQTOpenGLKilobotCustom::SetWhitePlasticMaterial() {
       const GLfloat pfColor[]     = {   1.0f, 1.0f, 1.0f, 1.0f };
       const GLfloat pfSpecular[]  = {   0.9f, 0.9f, 0.9f, 1.0f };
       const GLfloat pfShininess[] = { 100.0f                   };
@@ -114,7 +114,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CQTOpenGLKilobot::SetBlackTireMaterial() {
+   void CQTOpenGLKilobotCustom::SetBlackTireMaterial() {
       const GLfloat pfColor[]     = { 0.0f, 0.0f, 0.0f, 1.0f };
       const GLfloat pfSpecular[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
       const GLfloat pfShininess[] = { 0.0f                   };
@@ -128,7 +128,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CQTOpenGLKilobot::SetCircuitBoardMaterial() {
+   void CQTOpenGLKilobotCustom::SetCircuitBoardMaterial() {
       const GLfloat pfColor[]     = { 1.0f, 1.0f, 0.0f, 1.0f };
       const GLfloat pfSpecular[]  = { 0.5f, 0.5f, 1.0f, 1.0f };
       const GLfloat pfShininess[] = { 10.0f                  };
@@ -142,7 +142,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CQTOpenGLKilobot::SetLEDMaterial(GLfloat f_red, GLfloat f_green, GLfloat f_blue) {
+   void CQTOpenGLKilobotCustom::SetLEDMaterial(GLfloat f_red, GLfloat f_green, GLfloat f_blue) {
       const GLfloat pfColor[]     = {f_red, f_green, f_blue, 1.0f };
       const GLfloat pfSpecular[]  = { 0.0f,    0.0f,   0.0f, 1.0f };
       const GLfloat pfShininess[] = { 0.0f };
@@ -156,7 +156,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CQTOpenGLKilobot::RenderWheel() {
+   void CQTOpenGLKilobotCustom::RenderWheel() {
       /* Set material */
       SetWhitePlasticMaterial();
       CVector2 cVertex(KILOBOT_PIN_RADIUS, 0.0f);
@@ -197,7 +197,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CQTOpenGLKilobot::RenderBase() {
+   void CQTOpenGLKilobotCustom::RenderBase() {
       /* Set material */
       SetCircuitBoardMaterial();
       /* Circuit board */
@@ -238,7 +238,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CQTOpenGLKilobot::RenderLED() {
+   void CQTOpenGLKilobotCustom::RenderLED() {
       CVector2 cVertex(KILOBOT_LED_RADIUS, 0.0f);
       CRadians cAngle(-CRadians::TWO_PI / m_unVertices);
       /* Bottom part */
@@ -277,28 +277,28 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   class CQTOpenGLOperationDrawKilobotNormal : public CQTOpenGLOperationDrawNormal {
+   class CQTOpenGLOperationDrawKilobotCustomNormal : public CQTOpenGLOperationDrawNormal {
    public:
       void ApplyTo(CQTOpenGLWidget& c_visualization,
-                   CKilobotEntity& c_entity) {
-         static CQTOpenGLKilobot m_cModel;
+                   CKilobotCustomEntity& c_entity) {
+         static CQTOpenGLKilobotCustom m_cModel;
          c_visualization.DrawRays(c_entity.GetControllableEntity());
          c_visualization.DrawEntity(c_entity.GetEmbodiedEntity());
          m_cModel.Draw(c_entity);
       }
    };
 
-   class CQTOpenGLOperationDrawKilobotSelected : public CQTOpenGLOperationDrawSelected {
+   class CQTOpenGLOperationDrawKilobotCustomSelected : public CQTOpenGLOperationDrawSelected {
    public:
       void ApplyTo(CQTOpenGLWidget& c_visualization,
-                   CKilobotEntity& c_entity) {
+                   CKilobotCustomEntity& c_entity) {
          c_visualization.DrawBoundingBox(c_entity.GetEmbodiedEntity());
       }
    };
 
-   REGISTER_QTOPENGL_ENTITY_OPERATION(CQTOpenGLOperationDrawNormal, CQTOpenGLOperationDrawKilobotNormal, CKilobotEntity);
+   REGISTER_QTOPENGL_ENTITY_OPERATION(CQTOpenGLOperationDrawNormal, CQTOpenGLOperationDrawKilobotCustomNormal, CKilobotCustomEntity);
 
-   REGISTER_QTOPENGL_ENTITY_OPERATION(CQTOpenGLOperationDrawSelected, CQTOpenGLOperationDrawKilobotSelected, CKilobotEntity);
+   REGISTER_QTOPENGL_ENTITY_OPERATION(CQTOpenGLOperationDrawSelected, CQTOpenGLOperationDrawKilobotCustomSelected, CKilobotCustomEntity);
 
    /****************************************/
    /****************************************/

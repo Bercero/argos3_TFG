@@ -1,5 +1,5 @@
 #include "kilobot_communication_default_sensor.h"
-#include "kilobot_entity.h"
+#include "kilobot_custom_entity.h"
 #include "kilobot_communication_entity.h"
 #include "kilobot_communication_medium.h"
 #include <argos3/core/simulator/simulator.h>
@@ -26,7 +26,7 @@ namespace argos {
 
    void CKilobotCommunicationDefaultSensor::SetRobot(CComposableEntity& c_entity) {
       /* Assign Kilobot entity to this sensor */
-      m_pcRobot = dynamic_cast<CKilobotEntity*>(&c_entity);
+      m_pcRobot = dynamic_cast<CKilobotCustomEntity*>(&c_entity);
       /* Assign Kilobot communication entity to this sensor */
       m_pcCommEntity = &c_entity.GetComponent<CKilobotCommunicationEntity>("kilocomm");
       /* Get reference to controllable entity */
@@ -116,7 +116,7 @@ namespace argos {
          m_tPackets.push_back(sPacket);
       } /* communicating neighbors loop */
    }
-   
+
    /****************************************/
    /****************************************/
 
@@ -187,5 +187,5 @@ namespace argos {
                    "    ...\n"
                    "  </controllers>\n",
                    "Usable");
-   
+
 }

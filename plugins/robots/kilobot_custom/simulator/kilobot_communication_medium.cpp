@@ -1,5 +1,5 @@
 #include "kilobot_communication_medium.h"
-#include "kilobot_entity.h"
+#include "kilobot_custom_entity.h"
 #include <argos3/core/simulator/entity/embodied_entity.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/simulator/space/space.h>
@@ -264,7 +264,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationMedium::SendOHCMessageTo(CKilobotEntity& c_robot,
+   void CKilobotCommunicationMedium::SendOHCMessageTo(CKilobotCustomEntity& c_robot,
                                                       message_t* pt_message) {
       /*
        * old   | new   | action
@@ -286,7 +286,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationMedium::SendOHCMessageTo(std::vector<CKilobotEntity*>& vec_robots,
+   void CKilobotCommunicationMedium::SendOHCMessageTo(std::vector<CKilobotCustomEntity*>& vec_robots,
                                                       message_t* pt_message) {
       for(size_t i = 0; i < vec_robots.size(); ++i) {
          /*
@@ -310,7 +310,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   message_t* CKilobotCommunicationMedium::GetOHCMessageFor(CKilobotEntity& c_robot) {
+   message_t* CKilobotCommunicationMedium::GetOHCMessageFor(CKilobotCustomEntity& c_robot) {
       /* Look for robot in map */
       unordered_map<ssize_t, message_t*>::iterator it = m_mapOHCMessages.find(c_robot.GetIndex());
       /* Return entry if robot found, NULL otherwise */

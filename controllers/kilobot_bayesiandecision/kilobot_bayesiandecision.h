@@ -8,12 +8,12 @@
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include <argos3/plugins/robots/kilobot/control_interface/kilolib.h>
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_led_actuator.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/kilolib.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_led_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_ground_sensor.h>
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_communication_sensor.h>
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_communication_actuator.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_communication_sensor.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_communication_actuator.h>
 #include <argos3/core/utility/logging/argos_log.h>
 #include <boost/math/distributions/beta.hpp>
 

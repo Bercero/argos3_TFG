@@ -10,12 +10,12 @@
 namespace argos {
    class CPointMass3DEngine;
    class CPointMass3DKilobotModel;
-   class CKilobotEntity;
+   class CKilobotCustomEntity;
 }
 
 #include <argos3/plugins/simulator/physics_engines/pointmass3d/pointmass3d_model.h>
 #include <argos3/core/simulator/entity/embodied_entity.h>
-#include <argos3/plugins/robots/kilobot/simulator/kilobot_entity.h>
+#include "kilobot_custom_entity.h"
 
 namespace argos {
 
@@ -24,7 +24,7 @@ namespace argos {
    public:
 
       CPointMass3DKilobotModel(CPointMass3DEngine& c_engine,
-                               CKilobotEntity& c_kilobot);
+                               CKilobotCustomEntity& c_kilobot);
 
       virtual ~CPointMass3DKilobotModel() {}
 

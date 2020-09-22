@@ -49,9 +49,9 @@ void CBayesianDecisionLoopFunctions::Init(TConfigurationNode& t_tree) {
     }
     //TODO comentar, tiene que ver con la condicion de salida
     CSpace::TMapPerType robot_map = CSimulator::GetInstance().GetSpace().GetEntitiesByType("kilobot");
-    CKilobotEntity *kb;
+    CKilobotCustomEntity *kb;
     for (typeof(robot_map.begin()) it=robot_map.begin(); it!=robot_map.end(); ++it){
-        kb = any_cast<CKilobotEntity*>(it->second);
+        kb = any_cast<CKilobotCustomEntity*>(it->second);
         CCI_Controller *controller = &(kb->GetControllableEntity().GetController());
         controllers.push_back( dynamic_cast<CKilobotBayesianDecision*>(controller) );
     }

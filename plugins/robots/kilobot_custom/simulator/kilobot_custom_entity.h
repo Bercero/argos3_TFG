@@ -1,5 +1,5 @@
 /**
- * @file <argos3/plugins/robots/kilobot/simulator/kilobot_entity.h>
+ * @file <argos3/plugins/robots/kilobot/simulator/kilobot_custom_entity.h>
  *
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  * @author Vito Trianni - <vito.trianni@istc.cnr.it>
@@ -11,7 +11,7 @@
 namespace argos {
    class CControllableEntity;
    class CEmbodiedEntity;
-   class CKilobotEntity;
+   class CKilobotCustomEntity;
    class CLEDEquippedEntity;
    class CLightSensorEquippedEntity;
    class CKilobotCommunicationEntity;
@@ -25,7 +25,7 @@ namespace argos {
 
 namespace argos {
 
-   class CKilobotEntity : public CComposableEntity {
+   class CKilobotCustomEntity : public CComposableEntity {
 
    public:
 
@@ -33,9 +33,9 @@ namespace argos {
 
    public:
 
-      CKilobotEntity();
+      CKilobotCustomEntity();
 
-      CKilobotEntity(const std::string& str_id,
+      CKilobotCustomEntity(const std::string& str_id,
                      const std::string& str_controller_id,
                      const CVector3& c_position = CVector3(),
                      const CQuaternion& c_orientation = CQuaternion(),

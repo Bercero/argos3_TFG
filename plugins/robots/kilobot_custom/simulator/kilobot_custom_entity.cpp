@@ -4,7 +4,7 @@
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  */
 
-#include "kilobot_entity.h"
+#include "kilobot_custom_entity.h"
 #include "kilobot_measures.h"
 
 #include <argos3/core/utility/math/matrix/rotationmatrix3.h>
@@ -21,7 +21,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CKilobotEntity::CKilobotEntity() :
+   CKilobotCustomEntity::CKilobotCustomEntity() :
       // main_color(0,0,255),
       CComposableEntity(NULL),
       m_pcControllableEntity(NULL),
@@ -37,7 +37,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CKilobotEntity::CKilobotEntity(const std::string& str_id,
+   CKilobotCustomEntity::CKilobotCustomEntity(const std::string& str_id,
                                   const std::string& str_controller_id,
                                   const CVector3& c_position,
                                   const CQuaternion& c_orientation,
@@ -116,7 +116,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CKilobotEntity::Init(TConfigurationNode& t_tree) {
+   void CKilobotCustomEntity::Init(TConfigurationNode& t_tree) {
       try {
           // GetNodeAttributeOrDefault(t_tree,"color",main_color,main_color);
          /*
@@ -189,7 +189,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CKilobotEntity::Reset() {
+   void CKilobotCustomEntity::Reset() {
       /* Reset all components */
       CComposableEntity::Reset();
       /* Update components */
@@ -199,7 +199,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CKilobotEntity::Destroy() {
+   void CKilobotCustomEntity::Destroy() {
       CComposableEntity::Destroy();
    }
 
@@ -208,7 +208,7 @@ namespace argos {
 
 #define UPDATE(COMPONENT) if(COMPONENT->IsEnabled()) COMPONENT->Update();
 
-   void CKilobotEntity::UpdateComponents() {
+   void CKilobotCustomEntity::UpdateComponents() {
       UPDATE(m_pcKilobotCommunicationEntity);
       UPDATE(m_pcLEDEquippedEntity);
    }
@@ -216,11 +216,11 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   REGISTER_ENTITY(CKilobotEntity,
-                   "kilobot",
+   REGISTER_ENTITY(CKilobotCustomEntity,
+                   "kilobot_custom",
                    "Carlo Pinciroli [ilpincy@gmail.com] - Vito Trianni [vito.trianni@istc.cnr.it",
                    "1.0",
-                   "The Kilobot robot, developed at Harvard University.",
+                   "A customized Kilobot robot with ground sensor and compass",
                    "The Kilobot is a low-cost robot designed to make testing collective algorithms\n"
                    "on hundreds or thousands (\"kilos\") of robots accessible to robotics\n"
                    "researchers.\n"
@@ -229,10 +229,10 @@ namespace argos {
                    "REQUIRED XML CONFIGURATION\n\n"
                    "  <arena ...>\n"
                    "    ...\n"
-                   "    <kilobot id=\"fb0\">\n"
+                   "    <kilobot_custom id=\"fb0\">\n"
                    "      <body position=\"0.4,2.3,0.25\" orientation=\"45,0,0\" />\n"
                    "      <controller config=\"mycntrl\" />\n"
-                   "    </kilobot>\n"
+                   "    </kilobot_custom>\n"
                    "    ...\n"
                    "  </arena>\n\n"
                    "The 'id' attribute is necessary and must be unique among the entities. If two\n"
@@ -259,10 +259,10 @@ namespace argos {
                    "'communication_range' attribute, you can change it to, i.e., 15cm as follows:\n\n"
                    "  <arena ...>\n"
                    "    ...\n"
-                   "    <kilobot id=\"fb0\" communication_range=\"0.15\">\n"
+                   "    <kilobot_custom id=\"fb0\" communication_range=\"0.15\">\n"
                    "      <body position=\"0.4,2.3,0.25\" orientation=\"45,0,0\" />\n"
                    "      <controller config=\"mycntrl\" />\n"
-                   "    </kilobot>\n"
+                   "    </kilobot_custom>\n"
                    "    ...\n"
                    "  </arena>\n\n"
                    ,
@@ -272,7 +272,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   REGISTER_STANDARD_SPACE_OPERATIONS_ON_COMPOSABLE(CKilobotEntity);
+   REGISTER_STANDARD_SPACE_OPERATIONS_ON_COMPOSABLE(CKilobotCustomEntity);
 
    /****************************************/
    /****************************************/

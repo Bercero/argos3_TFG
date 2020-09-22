@@ -4,7 +4,7 @@
 namespace argos {
    class CKilobotCommunicationMedium;
    class CKilobotCommunicationEntity;
-   class CKilobotEntity;
+   class CKilobotCustomEntity;
 }
 
 #include <argos3/core/utility/math/rng.h>
@@ -75,7 +75,7 @@ namespace argos {
        * @param c_robot The message recipient.
        * @param pt_message The message payload.
        */
-      void SendOHCMessageTo(CKilobotEntity& c_robot,
+      void SendOHCMessageTo(CKilobotCustomEntity& c_robot,
                             message_t* pt_message);
 
       /**
@@ -86,14 +86,14 @@ namespace argos {
        * @param vec_robots The message recipients.
        * @param pt_message The message payload.
        */
-      void SendOHCMessageTo(std::vector<CKilobotEntity*>& vec_robots,
+      void SendOHCMessageTo(std::vector<CKilobotCustomEntity*>& vec_robots,
                             message_t* Message);
 
       /**
        * Returns the OHC message for the given Kilobot.
        * @returns the OHC message payload (or NULL if no message is associated to the given robot)
        */
-      message_t* GetOHCMessageFor(CKilobotEntity& c_robot);
+      message_t* GetOHCMessageFor(CKilobotCustomEntity& c_robot);
 
    private:
 
