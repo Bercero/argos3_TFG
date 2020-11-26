@@ -48,7 +48,7 @@ void CBayesianDecisionLoopFunctions::Init(TConfigurationNode& t_tree) {
         grid.erase(grid.begin()+index);
     }
     //TODO comentar, tiene que ver con la condicion de salida
-    CSpace::TMapPerType robot_map = CSimulator::GetInstance().GetSpace().GetEntitiesByType("kilobot");
+    CSpace::TMapPerType robot_map = CSimulator::GetInstance().GetSpace().GetEntitiesByType("kilobot_custom");
     CKilobotCustomEntity *kb;
     for (typeof(robot_map.begin()) it=robot_map.begin(); it!=robot_map.end(); ++it){
         kb = any_cast<CKilobotCustomEntity*>(it->second);

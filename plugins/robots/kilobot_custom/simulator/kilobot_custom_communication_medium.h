@@ -1,37 +1,37 @@
-#ifndef KILOBOT_COMMUNICATION_MEDIUM_H
-#define KILOBOT_COMMUNICATION_MEDIUM_H
+#ifndef KILOBOT_CUSTOM_COMMUNICATION_MEDIUM_H
+#define KILOBOT_CUSTOM_COMMUNICATION_MEDIUM_H
 
 namespace argos {
-   class CKilobotCommunicationMedium;
-   class CKilobotCommunicationEntity;
+   class CKilobotCustomCommunicationMedium;
+   class CKilobotCustomCommunicationEntity;
    class CKilobotCustomEntity;
 }
 
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/simulator/medium/medium.h>
 #include <argos3/core/simulator/space/positional_indices/positional_index.h>
-#include <argos3/plugins/robots/kilobot/simulator/kilobot_communication_entity.h>
+#include <argos3/plugins/robots/kilobot_custom/simulator/kilobot_custom_communication_entity.h>
 
 namespace argos {
 
-   class CKilobotCommunicationMedium : public CMedium {
+   class CKilobotCustomCommunicationMedium : public CMedium {
 
    public:
 
       /** Defines the adjacency matrix */
-      typedef unordered_map<ssize_t, CSet<CKilobotCommunicationEntity*, SEntityComparator> > TAdjacencyMatrix;
+      typedef unordered_map<ssize_t, CSet<CKilobotCustomCommunicationEntity*, SEntityComparator> > TAdjacencyMatrix;
 
    public:
 
       /**
        * Class constructor.
        */
-      CKilobotCommunicationMedium();
+      CKilobotCustomCommunicationMedium();
 
       /**
        * Class destructor.
        */
-      virtual ~CKilobotCommunicationMedium();
+      virtual ~CKilobotCustomCommunicationMedium();
 
       virtual void Init(TConfigurationNode& t_tree);
       virtual void PostSpaceInit();
@@ -43,13 +43,13 @@ namespace argos {
        * Adds the specified entity to the list of managed entities.
        * @param c_entity The entity to add.
        */
-      void AddEntity(CKilobotCommunicationEntity& c_entity);
+      void AddEntity(CKilobotCustomCommunicationEntity& c_entity);
       
       /**
        * Removes the specified entity from the list of managed entities.
        * @param c_entity The entity to remove.
        */
-      void RemoveEntity(CKilobotCommunicationEntity& c_entity);
+      void RemoveEntity(CKilobotCustomCommunicationEntity& c_entity);
 
       /**
        * Returns an immutable vector of entities that can communicate with the given entity.
@@ -57,7 +57,7 @@ namespace argos {
        * @return An immutable vector of entities that can communicate with the given entity.       
        * @throws CARGoSException If the passed entity is not managed by this medium.
        */
-      const CSet<CKilobotCommunicationEntity*,SEntityComparator>& GetKilobotsCommunicatingWith(CKilobotCommunicationEntity& c_entity) const;
+      const CSet<CKilobotCustomCommunicationEntity*,SEntityComparator>& GetKilobotCustomsCommunicatingWith(CKilobotCustomCommunicationEntity& c_entity) const;
 
       /**
        * Returns a reference to the adjacency matrix.
@@ -90,7 +90,7 @@ namespace argos {
                             message_t* Message);
 
       /**
-       * Returns the OHC message for the given Kilobot.
+       * Returns the OHC message for the given KilobotCustom.
        * @returns the OHC message payload (or NULL if no message is associated to the given robot)
        */
       message_t* GetOHCMessageFor(CKilobotCustomEntity& c_robot);
@@ -103,11 +103,11 @@ namespace argos {
       /** The adjacency matrix of neighbors of a transmitting robot who are also transmitting */
       TAdjacencyMatrix m_tTxNeighbors;
 
-      /** A positional index for the kilobot communication entities */
-      CPositionalIndex<CKilobotCommunicationEntity>* m_pcKilobotIndex;
+      /** A positional index for the kilobot_custom communication entities */
+      CPositionalIndex<CKilobotCustomCommunicationEntity>* m_pcKilobotCustomIndex;
 
       /** The update operation for the grid positional index */
-      CKilobotCommunicationEntityGridEntityUpdater* m_pcGridUpdateOperation;
+      CKilobotCustomCommunicationEntityGridEntityUpdater* m_pcGridUpdateOperation;
 
       /** A list of messages set through SendOHCMessageTo() */
       unordered_map<ssize_t, message_t*> m_mapOHCMessages;

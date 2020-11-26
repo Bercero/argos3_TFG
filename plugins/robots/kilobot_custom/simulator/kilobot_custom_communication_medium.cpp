@@ -1,4 +1,4 @@
-#include "kilobot_communication_medium.h"
+#include "kilobot_custom_communication_medium.h"
 #include "kilobot_custom_entity.h"
 #include <argos3/core/simulator/entity/embodied_entity.h>
 #include <argos3/core/simulator/simulator.h>
@@ -6,15 +6,15 @@
 #include <argos3/core/simulator/space/positional_indices/grid.h>
 #include <argos3/core/utility/configuration/argos_exception.h>
 #include <argos3/core/utility/logging/argos_log.h>
-#include <argos3/plugins/robots/kilobot/simulator/kilobot_measures.h>
+#include <argos3/plugins/robots/kilobot_custom/simulator/kilobot_custom_measures.h>
 
 namespace argos {
 
    /****************************************/
    /****************************************/
 
-   CKilobotCommunicationMedium::CKilobotCommunicationMedium() :
-      m_pcKilobotIndex(NULL),
+   CKilobotCustomCommunicationMedium::CKilobotCustomCommunicationMedium() :
+      m_pcKilobotCustomIndex(NULL),
       m_pcGridUpdateOperation(NULL),
       m_pcRNG(NULL),
       m_fRxProb(0.0),
@@ -25,13 +25,13 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CKilobotCommunicationMedium::~CKilobotCommunicationMedium() {
+   CKilobotCustomCommunicationMedium::~CKilobotCustomCommunicationMedium() {
    }
 
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationMedium::Init(TConfigurationNode& t_tree) {
+   void CKilobotCustomCommunicationMedium::Init(TConfigurationNode& t_tree) {
       try {
          CMedium::Init(t_tree);
          /* Get the arena center and size */
@@ -41,14 +41,14 @@ namespace argos {
          GetNodeAttribute(tArena, "size", cArenaSize);
          GetNodeAttributeOrDefault(tArena, "center", cArenaCenter, cArenaCenter);
          /* Create the positional index for embodied entities */
-         UInt32 unXCells = Ceil(cArenaSize.GetX() / (KILOBOT_RADIUS+KILOBOT_RADIUS));
-         UInt32 unYCells = Ceil(cArenaSize.GetY() / (KILOBOT_RADIUS+KILOBOT_RADIUS));
-         CGrid<CKilobotCommunicationEntity>* pcGrid = new CGrid<CKilobotCommunicationEntity>(
+         UInt32 unXCells = Ceil(cArenaSize.GetX() / (KILOBOT_CUSTOM_RADIUS+KILOBOT_CUSTOM_RADIUS));
+         UInt32 unYCells = Ceil(cArenaSize.GetY() / (KILOBOT_CUSTOM_RADIUS+KILOBOT_CUSTOM_RADIUS));
+         CGrid<CKilobotCustomCommunicationEntity>* pcGrid = new CGrid<CKilobotCustomCommunicationEntity>(
             cArenaCenter - cArenaSize * 0.5f, cArenaCenter + cArenaSize * 0.5f,
             unXCells, unYCells, 1);
-         m_pcGridUpdateOperation = new CKilobotCommunicationEntityGridEntityUpdater(*pcGrid);
+         m_pcGridUpdateOperation = new CKilobotCustomCommunicationEntityGridEntityUpdater(*pcGrid);
          pcGrid->SetUpdateEntityOperation(m_pcGridUpdateOperation);
-         m_pcKilobotIndex = pcGrid;
+         m_pcKilobotCustomIndex = pcGrid;
          /* Set probability of receiving a message */
          GetNodeAttributeOrDefault(t_tree, "message_drop_prob", m_fRxProb, m_fRxProb);
          m_fRxProb = 1.0 - m_fRxProb;
@@ -65,16 +65,16 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationMedium::PostSpaceInit() {
+   void CKilobotCustomCommunicationMedium::PostSpaceInit() {
       Update();
    }
 
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationMedium::Reset() {
-      /* Reset positional index of Kilobot entities */
-      m_pcKilobotIndex->Reset();
+   void CKilobotCustomCommunicationMedium::Reset() {
+      /* Reset positional index of KilobotCustom entities */
+      m_pcKilobotCustomIndex->Reset();
       /* Delete adjacency matrix */
       for(TAdjacencyMatrix::iterator it = m_tCommMatrix.begin();
           it != m_tCommMatrix.end();
@@ -86,8 +86,8 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationMedium::Destroy() {
-      delete m_pcKilobotIndex;
+   void CKilobotCustomCommunicationMedium::Destroy() {
+      delete m_pcKilobotCustomIndex;
       if(m_pcGridUpdateOperation != NULL)
          delete m_pcGridUpdateOperation;
    }
@@ -95,17 +95,17 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   static size_t HashKilobotPair(const std::pair<CKilobotCommunicationEntity*, CKilobotCommunicationEntity*>& c_pair) {
+   static size_t HashKilobotCustomPair(const std::pair<CKilobotCustomCommunicationEntity*, CKilobotCustomCommunicationEntity*>& c_pair) {
       return
          reinterpret_cast<size_t>(c_pair.first) ^
          reinterpret_cast<size_t>(c_pair.second);
    }
 
-   void CKilobotCommunicationMedium::Update() {
+   void CKilobotCustomCommunicationMedium::Update() {
       /*
-       * Update positional index of Kilobot entities
+       * Update positional index of KilobotCustom entities
        */
-      m_pcKilobotIndex->Update();
+      m_pcKilobotCustomIndex->Update();
       /*
        * Delete obsolete adjacency matrices
        */
@@ -119,66 +119,66 @@ namespace argos {
        * Construct the adjacency matrix of transmitting robots
        */
       /* Buffer for the communicating entities */
-      CSet<CKilobotCommunicationEntity*,SEntityComparator> cOtherKilobots;
+      CSet<CKilobotCustomCommunicationEntity*,SEntityComparator> cOtherKilobotCustoms;
       /* This map contains the pairs that have already been checked */
-      unordered_map<size_t, std::pair<CKilobotCommunicationEntity*, CKilobotCommunicationEntity*> > mapPairsAlreadyChecked;
+      unordered_map<size_t, std::pair<CKilobotCustomCommunicationEntity*, CKilobotCustomCommunicationEntity*> > mapPairsAlreadyChecked;
       /* Iterator for the above structure */
-      unordered_map<size_t, std::pair<CKilobotCommunicationEntity*, CKilobotCommunicationEntity*> >::iterator itPair;
+      unordered_map<size_t, std::pair<CKilobotCustomCommunicationEntity*, CKilobotCustomCommunicationEntity*> >::iterator itPair;
       /* Used as test key */
-      std::pair<CKilobotCommunicationEntity*, CKilobotCommunicationEntity*> cTestKey;
+      std::pair<CKilobotCustomCommunicationEntity*, CKilobotCustomCommunicationEntity*> cTestKey;
       /* Used as hash for the test key */
       size_t unTestHash;
-      /* The square distance between two Kilobots */
+      /* The square distance between two KilobotCustoms */
       Real fSqDistance;
-      /* Go through the Kilobot entities */
+      /* Go through the KilobotCustom entities */
       for(TAdjacencyMatrix::iterator it = m_tCommMatrix.begin();
           it != m_tCommMatrix.end();
           ++it) {
-         /* Get a reference to the current Kilobot entity */
-         CKilobotCommunicationEntity& cKilobot = *reinterpret_cast<CKilobotCommunicationEntity*>(GetSpace().GetEntityVector()[it->first]);
+         /* Get a reference to the current KilobotCustom entity */
+         CKilobotCustomCommunicationEntity& cKilobotCustom = *reinterpret_cast<CKilobotCustomCommunicationEntity*>(GetSpace().GetEntityVector()[it->first]);
          /* Is this robot trying to transmit? */
-         if(cKilobot.GetTxStatus() == CKilobotCommunicationEntity::TX_ATTEMPT) {
+         if(cKilobotCustom.GetTxStatus() == CKilobotCustomCommunicationEntity::TX_ATTEMPT) {
             /* Yes, add it to the list of transmitting robots */
-            m_tTxNeighbors[cKilobot.GetIndex()];
-            /* Get the list of Kilobots in range */
-            cOtherKilobots.clear();
-            m_pcKilobotIndex->GetEntitiesAt(cOtherKilobots, cKilobot.GetPosition());
-            /* Go through the Kilobots in range */
-            for(CSet<CKilobotCommunicationEntity*,SEntityComparator>::iterator it2 = cOtherKilobots.begin();
-                it2 != cOtherKilobots.end();
+            m_tTxNeighbors[cKilobotCustom.GetIndex()];
+            /* Get the list of KilobotCustoms in range */
+            cOtherKilobotCustoms.clear();
+            m_pcKilobotCustomIndex->GetEntitiesAt(cOtherKilobotCustoms, cKilobotCustom.GetPosition());
+            /* Go through the KilobotCustoms in range */
+            for(CSet<CKilobotCustomCommunicationEntity*,SEntityComparator>::iterator it2 = cOtherKilobotCustoms.begin();
+                it2 != cOtherKilobotCustoms.end();
                 ++it2) {
-               /* Get a reference to the neighboring Kilobot */
-               CKilobotCommunicationEntity& cOtherKilobot = **it2;
+               /* Get a reference to the neighboring KilobotCustom */
+               CKilobotCustomCommunicationEntity& cOtherKilobotCustom = **it2;
                /* First, make sure the entities are not the same and
                   that they are both transmitting */
-               if(&cKilobot != &cOtherKilobot &&
-                  cOtherKilobot.GetTxStatus() == CKilobotCommunicationEntity::TX_ATTEMPT) {
+               if(&cKilobotCustom != &cOtherKilobotCustom &&
+                  cOtherKilobotCustom.GetTxStatus() == CKilobotCustomCommunicationEntity::TX_ATTEMPT) {
                   /* Proceed if the pair has not been checked already */
-                  if(&cKilobot < &cOtherKilobot) {
-                     cTestKey.first = &cKilobot;
-                     cTestKey.second = &cOtherKilobot;
+                  if(&cKilobotCustom < &cOtherKilobotCustom) {
+                     cTestKey.first = &cKilobotCustom;
+                     cTestKey.second = &cOtherKilobotCustom;
                   }
                   else {
-                     cTestKey.first = &cOtherKilobot;
-                     cTestKey.second = &cKilobot;
+                     cTestKey.first = &cOtherKilobotCustom;
+                     cTestKey.second = &cKilobotCustom;
                   }
-                  unTestHash = HashKilobotPair(cTestKey);
+                  unTestHash = HashKilobotCustomPair(cTestKey);
                   itPair = mapPairsAlreadyChecked.find(unTestHash);
                   if(itPair == mapPairsAlreadyChecked.end() ||   /* Pair does not exist */
-                     itPair->second.first != cTestKey.first ||   /* Pair exists, but first Kilobot involved is different */
-                     itPair->second.second != cTestKey.second) { /* Pair exists, but second Kilobot involved is different */
+                     itPair->second.first != cTestKey.first ||   /* Pair exists, but first KilobotCustom involved is different */
+                     itPair->second.second != cTestKey.second) { /* Pair exists, but second KilobotCustom involved is different */
                      /* Mark this pair as already checked */
                      mapPairsAlreadyChecked[unTestHash] = cTestKey;
                      /* Calculate square distance */
-                     fSqDistance = SquareDistance(cKilobot.GetPosition(),
-                                                  cOtherKilobot.GetPosition());
-                     if(fSqDistance < Square(cOtherKilobot.GetTxRange())) {
-                        /* cKilobot receives cOtherKilobot's message */
-                        m_tTxNeighbors[cKilobot.GetIndex()].insert(&cOtherKilobot);
+                     fSqDistance = SquareDistance(cKilobotCustom.GetPosition(),
+                                                  cOtherKilobotCustom.GetPosition());
+                     if(fSqDistance < Square(cOtherKilobotCustom.GetTxRange())) {
+                        /* cKilobotCustom receives cOtherKilobotCustom's message */
+                        m_tTxNeighbors[cKilobotCustom.GetIndex()].insert(&cOtherKilobotCustom);
                      }
-                     if(fSqDistance < Square(cKilobot.GetTxRange())) {
-                        /* cOtherKilobot receives cKilobot's message */
-                        m_tTxNeighbors[cOtherKilobot.GetIndex()].insert(&cKilobot);
+                     if(fSqDistance < Square(cKilobotCustom.GetTxRange())) {
+                        /* cOtherKilobotCustom receives cKilobotCustom's message */
+                        m_tTxNeighbors[cOtherKilobotCustom.GetIndex()].insert(&cKilobotCustom);
                      }
                   } /* pair check */
                } /* entity identity + transmit check */
@@ -199,28 +199,28 @@ namespace argos {
             it->second.empty() ||
             m_pcRNG->Uniform(CRange<UInt32>(0, it->second.size() + 1)) == 0) {
             /* The robot can transmit */
-            /* Get a reference to the current Kilobot entity */
-            CKilobotCommunicationEntity& cKilobot = *reinterpret_cast<CKilobotCommunicationEntity*>(GetSpace().GetEntityVector()[it->first]);
+            /* Get a reference to the current KilobotCustom entity */
+            CKilobotCustomCommunicationEntity& cKilobotCustom = *reinterpret_cast<CKilobotCustomCommunicationEntity*>(GetSpace().GetEntityVector()[it->first]);
             /* Change its transmission status */
-            cKilobot.SetTxStatus(CKilobotCommunicationEntity::TX_SUCCESS);
+            cKilobotCustom.SetTxStatus(CKilobotCustomCommunicationEntity::TX_SUCCESS);
             /* Go through its neighbors */
-            cOtherKilobots.clear();
-            m_pcKilobotIndex->GetEntitiesAt(cOtherKilobots, cKilobot.GetPosition());
-            for(CSet<CKilobotCommunicationEntity*,SEntityComparator>::iterator it2 = cOtherKilobots.begin();
-                it2 != cOtherKilobots.end();
+            cOtherKilobotCustoms.clear();
+            m_pcKilobotCustomIndex->GetEntitiesAt(cOtherKilobotCustoms, cKilobotCustom.GetPosition());
+            for(CSet<CKilobotCustomCommunicationEntity*,SEntityComparator>::iterator it2 = cOtherKilobotCustoms.begin();
+                it2 != cOtherKilobotCustoms.end();
                 ++it2) {
-               /* Get a reference to the neighboring Kilobot entity */
-               CKilobotCommunicationEntity& cOtherKilobot = **it2;
+               /* Get a reference to the neighboring KilobotCustom entity */
+               CKilobotCustomCommunicationEntity& cOtherKilobotCustom = **it2;
                /* Make sure the robots are different */
-               if(&cKilobot != &cOtherKilobot) {
+               if(&cKilobotCustom != &cOtherKilobotCustom) {
                   /* Calculate distance */
-                  fSqDistance = SquareDistance(cKilobot.GetPosition(),
-                                               cOtherKilobot.GetPosition());
+                  fSqDistance = SquareDistance(cKilobotCustom.GetPosition(),
+                                               cOtherKilobotCustom.GetPosition());
                   /* If robots are within transmission range and transmission succeeds... */
-                  if(fSqDistance < Square(cKilobot.GetTxRange()) &&
+                  if(fSqDistance < Square(cKilobotCustom.GetTxRange()) &&
                      m_pcRNG->Bernoulli(m_fRxProb)) {
-                     /* cOtherKilobot receives cKilobot's message */
-                     m_tCommMatrix[cOtherKilobot.GetIndex()].insert(&cKilobot);
+                     /* cOtherKilobotCustom receives cKilobotCustom's message */
+                     m_tCommMatrix[cOtherKilobotCustom.GetIndex()].insert(&cKilobotCustom);
                   }
                } /* identity check */
             } /* neighbor loop */
@@ -231,18 +231,18 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationMedium::AddEntity(CKilobotCommunicationEntity& c_entity) {
+   void CKilobotCustomCommunicationMedium::AddEntity(CKilobotCustomCommunicationEntity& c_entity) {
       m_tCommMatrix.insert(
-         std::make_pair<ssize_t, CSet<CKilobotCommunicationEntity*,SEntityComparator> >(
-            c_entity.GetIndex(), CSet<CKilobotCommunicationEntity*,SEntityComparator>()));
-      m_pcKilobotIndex->AddEntity(c_entity);
+         std::make_pair<ssize_t, CSet<CKilobotCustomCommunicationEntity*,SEntityComparator> >(
+            c_entity.GetIndex(), CSet<CKilobotCustomCommunicationEntity*,SEntityComparator>()));
+      m_pcKilobotCustomIndex->AddEntity(c_entity);
    }
 
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationMedium::RemoveEntity(CKilobotCommunicationEntity& c_entity) {
-      m_pcKilobotIndex->RemoveEntity(c_entity);
+   void CKilobotCustomCommunicationMedium::RemoveEntity(CKilobotCustomCommunicationEntity& c_entity) {
+      m_pcKilobotCustomIndex->RemoveEntity(c_entity);
       TAdjacencyMatrix::iterator it = m_tCommMatrix.find(c_entity.GetIndex());
       if(it != m_tCommMatrix.end())
          m_tCommMatrix.erase(it);
@@ -251,20 +251,20 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   const CSet<CKilobotCommunicationEntity*,SEntityComparator>& CKilobotCommunicationMedium::GetKilobotsCommunicatingWith(CKilobotCommunicationEntity& c_entity) const {
+   const CSet<CKilobotCustomCommunicationEntity*,SEntityComparator>& CKilobotCustomCommunicationMedium::GetKilobotCustomsCommunicatingWith(CKilobotCustomCommunicationEntity& c_entity) const {
       TAdjacencyMatrix::const_iterator it = m_tCommMatrix.find(c_entity.GetIndex());
       if(it != m_tCommMatrix.end()) {
          return it->second;
       }
       else {
-         THROW_ARGOSEXCEPTION("Kilobot entity \"" << c_entity.GetId() << "\" is not managed by the Kilobot medium \"" << GetId() << "\"");
+         THROW_ARGOSEXCEPTION("KilobotCustom entity \"" << c_entity.GetId() << "\" is not managed by the KilobotCustom medium \"" << GetId() << "\"");
       }
    }
 
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationMedium::SendOHCMessageTo(CKilobotCustomEntity& c_robot,
+   void CKilobotCustomCommunicationMedium::SendOHCMessageTo(CKilobotCustomEntity& c_robot,
                                                       message_t* pt_message) {
       /*
        * old   | new   | action
@@ -286,7 +286,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationMedium::SendOHCMessageTo(std::vector<CKilobotCustomEntity*>& vec_robots,
+   void CKilobotCustomCommunicationMedium::SendOHCMessageTo(std::vector<CKilobotCustomEntity*>& vec_robots,
                                                       message_t* pt_message) {
       for(size_t i = 0; i < vec_robots.size(); ++i) {
          /*
@@ -310,7 +310,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   message_t* CKilobotCommunicationMedium::GetOHCMessageFor(CKilobotCustomEntity& c_robot) {
+   message_t* CKilobotCustomCommunicationMedium::GetOHCMessageFor(CKilobotCustomEntity& c_robot) {
       /* Look for robot in map */
       unordered_map<ssize_t, message_t*>::iterator it = m_mapOHCMessages.find(c_robot.GetIndex());
       /* Return entry if robot found, NULL otherwise */
@@ -320,12 +320,12 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   REGISTER_MEDIUM(CKilobotCommunicationMedium,
-                   "kilobot_communication",
+   REGISTER_MEDIUM(CKilobotCustomCommunicationMedium,
+                   "kilobot_custom_communication",
                    "Carlo Pinciroli [ilpincy@gmail.com]",
                    "1.0",
-                   "It simulates communication across Kilobot robots.",
-                   "This medium is required to simulate communication across Kilobots. It works as\n"
+                   "It simulates communication across KilobotCustom robots.",
+                   "This medium is required to simulate communication across KilobotCustoms. It works as\n"
                    "follows:\n"
                    "1. The medium calculates which robots can transmit at each time step. Every\n"
                    "   robot is assigned a non-transmission period. At the end of this period, the\n"
@@ -337,18 +337,18 @@ namespace argos {
                    "   to specify the probability of message dropping by a robot as an optional\n"
                    "   parameter (see below).\n\n"
                    "REQUIRED XML CONFIGURATION\n\n"
-                   "<kilobot_communication id=\"kbc\" />\n\n"
+                   "<kilobot_custom_communication id=\"kbc\" />\n\n"
                    "OPTIONAL XML CONFIGURATION\n\n"
                    "It is possible to specify the probability with which a robot a drops an incoming\n"
                    "message. This is done by setting the attribute \"message_drop_prob\". When set\n"
                    "to 0, no message is ever dropped; when set to 1, every message is dropped.\n\n"
-                   "<kilobot_communication id=\"kbc\" message_drop_prob=\"0.25\" />\n\n"
+                   "<kilobot_custom_communication id=\"kbc\" message_drop_prob=\"0.25\" />\n\n"
                    "It is also possible to ignore the effect of channel congestion. When two robots\n"
                    "are trying to send a message at the same time, a message conflict occurs. The\n"
                    "default behavior is to allow robots to complete message delivery according to a\n"
                    "random choice. If you don't want conflicts to be simulated, set the flag\n"
                    "'ignore_conflicts' to 'true':\n\n"
-                   "<kilobot_communication id=\"kbc\" ignore_conflicts=\"true\" />\n"
+                   "<kilobot_custom_communication id=\"kbc\" ignore_conflicts=\"true\" />\n"
                    ,
                    "Under development"
       );

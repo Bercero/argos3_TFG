@@ -2,12 +2,12 @@
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  */
 
-#ifndef KILOBOT_COMMUNICATION_ENTITY_H
-#define KILOBOT_COMMUNICATION_ENTITY_H
+#ifndef KILOBOT_CUSTOM_COMMUNICATION_ENTITY_H
+#define KILOBOT_CUSTOM_COMMUNICATION_ENTITY_H
 
 namespace argos {
-   class CKilobotCommunicationEntity;
-   class CKilobotCommunicationMedium;
+   class CKilobotCustomCommunicationEntity;
+   class CKilobotCustomCommunicationMedium;
    class CEmbodiedEntity;
    struct SAnchor;
 }
@@ -18,18 +18,18 @@ namespace argos {
 #include <argos3/core/simulator/entity/positional_entity.h>
 #include <argos3/core/simulator/space/positional_indices/space_hash.h>
 #include <argos3/core/simulator/space/positional_indices/grid.h>
-#include <argos3/plugins/robots/kilobot/control_interface/kilolib.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/kilolib.h>
 
 namespace argos {
 
-   class CKilobotCommunicationEntity : public CPositionalEntity {
+   class CKilobotCustomCommunicationEntity : public CPositionalEntity {
 
    public:
 
       ENABLE_VTABLE();
 
-      typedef std::vector<CKilobotCommunicationEntity*> TVector;
-      typedef CSet<CKilobotCommunicationEntity*> TSet;
+      typedef std::vector<CKilobotCustomCommunicationEntity*> TVector;
+      typedef CSet<CKilobotCustomCommunicationEntity*> TSet;
 
       enum ETxStatus {
          TX_NONE,
@@ -39,14 +39,14 @@ namespace argos {
 
    public:
 
-      CKilobotCommunicationEntity(CComposableEntity* pc_parent,
+      CKilobotCustomCommunicationEntity(CComposableEntity* pc_parent,
                                   const std::string& str_id,
                                   size_t un_msg_size,
                                   Real f_range,
                                   SAnchor& s_anchor,
                                   CEmbodiedEntity& c_entity_body);
 
-      virtual ~CKilobotCommunicationEntity() {}
+      virtual ~CKilobotCustomCommunicationEntity() {}
 
       virtual void Reset();
 
@@ -88,9 +88,9 @@ namespace argos {
 
       bool HasMedium() const;
 
-      CKilobotCommunicationMedium& GetMedium();
+      CKilobotCustomCommunicationMedium& GetMedium();
 
-      void SetMedium(CKilobotCommunicationMedium& c_medium);
+      void SetMedium(CKilobotCustomCommunicationMedium& c_medium);
 
       virtual std::string GetTypeDescription() const {
          return "kilocomm";
@@ -114,18 +114,18 @@ namespace argos {
       message_t* m_ptMessage;
 
       /** The communication medium associated to this entity */
-      CKilobotCommunicationMedium* m_pcMedium;
+      CKilobotCustomCommunicationMedium* m_pcMedium;
    };
 
    /****************************************/
    /****************************************/
 
-   class CKilobotCommunicationEntitySpaceHashUpdater : public CSpaceHashUpdater<CKilobotCommunicationEntity> {
+   class CKilobotCustomCommunicationEntitySpaceHashUpdater : public CSpaceHashUpdater<CKilobotCustomCommunicationEntity> {
 
    public:
 
-      virtual void operator()(CAbstractSpaceHash<CKilobotCommunicationEntity>& c_space_hash,
-                              CKilobotCommunicationEntity& c_element);
+      virtual void operator()(CAbstractSpaceHash<CKilobotCustomCommunicationEntity>& c_space_hash,
+                              CKilobotCustomCommunicationEntity& c_element);
 
    private:
 
@@ -136,36 +136,36 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   class CKilobotCommunicationEntityGridCellUpdater : public CGrid<CKilobotCommunicationEntity>::CCellOperation {
+   class CKilobotCustomCommunicationEntityGridCellUpdater : public CGrid<CKilobotCustomCommunicationEntity>::CCellOperation {
 
    public:
 
-      CKilobotCommunicationEntityGridCellUpdater(CGrid<CKilobotCommunicationEntity>& c_grid);
+      CKilobotCustomCommunicationEntityGridCellUpdater(CGrid<CKilobotCustomCommunicationEntity>& c_grid);
 
       virtual bool operator()(SInt32 n_i,
                               SInt32 n_j,
                               SInt32 n_k,
-                              CGrid<CKilobotCommunicationEntity>::SCell& s_cell);
+                              CGrid<CKilobotCustomCommunicationEntity>::SCell& s_cell);
 
-      void SetEntity(CKilobotCommunicationEntity& c_entity);
+      void SetEntity(CKilobotCustomCommunicationEntity& c_entity);
 
    private:
 
-      CGrid<CKilobotCommunicationEntity>& m_cGrid;
-      CKilobotCommunicationEntity* m_pcEntity;
+      CGrid<CKilobotCustomCommunicationEntity>& m_cGrid;
+      CKilobotCustomCommunicationEntity* m_pcEntity;
    };
 
-   class CKilobotCommunicationEntityGridEntityUpdater : public CGrid<CKilobotCommunicationEntity>::COperation {
+   class CKilobotCustomCommunicationEntityGridEntityUpdater : public CGrid<CKilobotCustomCommunicationEntity>::COperation {
 
    public:
 
-      CKilobotCommunicationEntityGridEntityUpdater(CGrid<CKilobotCommunicationEntity>& c_grid);
-      virtual bool operator()(CKilobotCommunicationEntity& c_entity);
+      CKilobotCustomCommunicationEntityGridEntityUpdater(CGrid<CKilobotCustomCommunicationEntity>& c_grid);
+      virtual bool operator()(CKilobotCustomCommunicationEntity& c_entity);
 
    private:
 
-      CGrid<CKilobotCommunicationEntity>& m_cGrid;
-      CKilobotCommunicationEntityGridCellUpdater m_cCellUpdater;
+      CGrid<CKilobotCustomCommunicationEntity>& m_cGrid;
+      CKilobotCustomCommunicationEntityGridCellUpdater m_cCellUpdater;
    };
 
    /****************************************/

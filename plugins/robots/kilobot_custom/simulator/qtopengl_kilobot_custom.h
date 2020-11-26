@@ -1,5 +1,5 @@
 /**
- * @file <argos3/plugins/robots/kilobot/simulator/qtopengl_kilobot.h>
+ * @file <argos3/plugins/robots/kilobot_custom/simulator/qtopengl_kilobot_custom.h>
  *
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  * @author Vito Trianni - <vito.trianni@istc.cnr.it>
@@ -63,11 +63,11 @@ namespace argos {
       /** List corresponding to the materialless wheel */
       GLuint m_unBasicWheelList;
 
-      /** kilobot wheel */
+      /** kilobot_custom wheel */
       GLuint m_unWheelList;
-      /** kilobot base module */
+      /** kilobot_custom base module */
       GLuint m_unBaseList;
-      /** kilobot LED */
+      /** kilobot_custom LED */
       GLuint m_unLEDList;
 
       /** Number of vertices to display the round parts

@@ -88,8 +88,8 @@ static float     kilo_delay        = 0.0f; // delay clock in ms
 static uint8_t   kilo_seed         = 0xAA; // default random seed
 static uint8_t   kilo_accumulator  = 0;    // rng accumulator
 static int       kilo_state_fd     = -1;   // shared memory file
-kilobot_state_t* kilo_state        = NULL; // shared robot state
-char*            kilo_str_id       = NULL; // kilobot id as string
+kilobot_custom_state_t* kilo_state        = NULL; // shared robot state
+char*            kilo_str_id       = NULL; // kilobot_custom id as string
 
 void preloop() {
    /* Update tick count */
@@ -201,7 +201,7 @@ void kilo_init() {
 }
 
 void cleanup() {
-   munmap(kilo_state, sizeof(kilobot_state_t));
+   munmap(kilo_state, sizeof(kilobot_custom_state_t));
    close(kilo_state_fd);
    shm_unlink(kilo_str_id);
 }
@@ -242,7 +242,7 @@ static uint16_t argos_id_to_kilo_uid(const char* argos_id) {
 }
 
 /* main() wrapper */
-int __kilobot_main(int argc, char* argv[]);
+int __kilobot_custom_main(int argc, char* argv[]);
 #undef main
 int main(int argc, char* argv[]) {
    /* Parse arguments */
@@ -270,11 +270,11 @@ int main(int argc, char* argv[]) {
       exit(1);
    }
    /* Resize shared memory area to contain the robot state, filling it with zeros */
-   ftruncate(kilo_state_fd, sizeof(kilobot_state_t));
+   ftruncate(kilo_state_fd, sizeof(kilobot_custom_state_t));
    /* Get pointer to shared memory area */
    kilo_state =
-      (kilobot_state_t*)mmap(NULL,
-                             sizeof(kilobot_state_t),
+      (kilobot_custom_state_t*)mmap(NULL,
+                             sizeof(kilobot_custom_state_t),
                              PROT_READ | PROT_WRITE,
                              MAP_SHARED,
                              kilo_state_fd,
@@ -297,5 +297,5 @@ int main(int argc, char* argv[]) {
    mt_rngidx = MT_N + 1;
    mt_setseed(strtoul(argv[4], NULL, 10));
    /* Call main of behavior */
-   return __kilobot_main(argc, argv);
+   return __kilobot_custom_main(argc, argv);
 }

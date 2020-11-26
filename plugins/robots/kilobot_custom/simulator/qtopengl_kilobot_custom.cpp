@@ -1,20 +1,18 @@
 /**
- * @file <argos3/plugins/robots/kilobot/simulator/qtopengl_kilobot.cpp>
+ * @file <argos3/plugins/robots/kilobot_custom/simulator/qtopengl_kilobot_custom.cpp>
  *
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  * @author Vito Trianni - <vito.trianni@istc.cnr.it>
  */
 
 #include "qtopengl_kilobot_custom.h"
-#include "kilobot_measures.h"
+#include "kilobot_custom_measures.h"
 #include "kilobot_custom_entity.h"
 #include <argos3/core/simulator/entity/embodied_entity.h>
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/vector3.h>
 #include <argos3/plugins/simulator/entities/led_equipped_entity.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_widget.h>
-// #include <argos3/core/utility/datatypes/color.h>
-
 
 namespace argos {
 
@@ -72,20 +70,20 @@ namespace argos {
    void CQTOpenGLKilobotCustom::Draw(CKilobotCustomEntity& c_entity) {
       /* Place the pins */
       glPushMatrix();
-      glTranslatef(KILOBOT_FRONT_PIN_DISTANCE, 0.0, 0.0f);
+      glTranslatef(KILOBOT_CUSTOM_FRONT_PIN_DISTANCE, 0.0, 0.0f);
       glCallList(m_unWheelList);
       glPopMatrix();
       glPushMatrix();
-      glTranslatef(0.0f, KILOBOT_HALF_INTERPIN_DISTANCE, 0.0f);
+      glTranslatef(0.0f, KILOBOT_CUSTOM_HALF_INTERPIN_DISTANCE, 0.0f);
       glCallList(m_unWheelList);
       glPopMatrix();
       glPushMatrix();
-      glTranslatef(0.0f, -KILOBOT_HALF_INTERPIN_DISTANCE, 0.0f);
+      glTranslatef(0.0f, -KILOBOT_CUSTOM_HALF_INTERPIN_DISTANCE, 0.0f);
       glCallList(m_unWheelList);
       glPopMatrix();
       /* Place the base */
       glPushMatrix();
-      glTranslatef(KILOBOT_ECCENTRICITY, 0.0f, 0.0f);
+      glTranslatef(KILOBOT_CUSTOM_ECCENTRICITY, 0.0f, 0.0f);
       glCallList(m_unBaseList);
       glPopMatrix();
       /* Place the beacon */
@@ -159,7 +157,7 @@ namespace argos {
    void CQTOpenGLKilobotCustom::RenderWheel() {
       /* Set material */
       SetWhitePlasticMaterial();
-      CVector2 cVertex(KILOBOT_PIN_RADIUS, 0.0f);
+      CVector2 cVertex(KILOBOT_CUSTOM_PIN_RADIUS, 0.0f);
       CRadians cAngle(-CRadians::TWO_PI / m_unVertices);
       /* Bottom side */
       glBegin(GL_POLYGON);
@@ -172,11 +170,11 @@ namespace argos {
       /* Side surface */
       cAngle = -cAngle;
       CVector2 cNormal(1.0f, 0.0f);
-      cVertex.Set(KILOBOT_PIN_RADIUS, 0.0f);
+      cVertex.Set(KILOBOT_CUSTOM_PIN_RADIUS, 0.0f);
       glBegin(GL_QUAD_STRIP);
       for(GLuint i = 0; i <= m_unVertices; i++) {
          glNormal3f(cNormal.GetX(), cNormal.GetY(), 0.0f);
-         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_PIN_HEIGHT);
+         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_CUSTOM_PIN_HEIGHT);
          glVertex3f(cVertex.GetX(), cVertex.GetY(), 0.0f);
          cVertex.Rotate(cAngle);
          cNormal.Rotate(cAngle);
@@ -185,9 +183,9 @@ namespace argos {
       /* Top part */
       glBegin(GL_POLYGON);
       glNormal3f(0.0f, 0.0f, 1.0f);
-      cVertex.Set(KILOBOT_PIN_RADIUS, 0.0f);
+      cVertex.Set(KILOBOT_CUSTOM_PIN_RADIUS, 0.0f);
       for(GLuint i = 0; i <= m_unVertices; i++) {
-         glVertex3f(cVertex.GetX(), cVertex.GetY(),  KILOBOT_PIN_HEIGHT);
+         glVertex3f(cVertex.GetX(), cVertex.GetY(),  KILOBOT_CUSTOM_PIN_HEIGHT);
          cVertex.Rotate(cAngle);
       }
       glEnd();
@@ -201,25 +199,25 @@ namespace argos {
       /* Set material */
       SetCircuitBoardMaterial();
       /* Circuit board */
-      CVector2 cVertex(KILOBOT_RADIUS, 0.0f);
+      CVector2 cVertex(KILOBOT_CUSTOM_RADIUS, 0.0f);
       CRadians cAngle(-CRadians::TWO_PI / m_unVertices);
       /* Bottom part */
       glBegin(GL_POLYGON);
       glNormal3f(0.0f, 0.0f, -1.0f);
       for(GLuint i = 0; i <= m_unVertices; i++) {
-         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_PIN_HEIGHT);
+         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_CUSTOM_PIN_HEIGHT);
          cVertex.Rotate(cAngle);
       }
       glEnd();
       /* Side surface */
       cAngle = -cAngle;
       CVector2 cNormal(1.0f, 0.0f);
-      cVertex.Set(KILOBOT_RADIUS, 0.0f);
+      cVertex.Set(KILOBOT_CUSTOM_RADIUS, 0.0f);
       glBegin(GL_QUAD_STRIP);
       for(GLuint i = 0; i <= m_unVertices; i++) {
          glNormal3f(cNormal.GetX(), cNormal.GetY(), 0.0f);
-         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_HEIGHT);
-         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_PIN_HEIGHT);
+         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_CUSTOM_HEIGHT);
+         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_CUSTOM_PIN_HEIGHT);
          cVertex.Rotate(cAngle);
          cNormal.Rotate(cAngle);
       }
@@ -227,9 +225,9 @@ namespace argos {
       /* Top part */
       glBegin(GL_POLYGON);
       glNormal3f(0.0f, 0.0f, 1.0f);
-      cVertex.Set(KILOBOT_RADIUS, 0.0f);
+      cVertex.Set(KILOBOT_CUSTOM_RADIUS, 0.0f);
       for(GLuint i = 0; i <= m_unVertices; i++) {
-         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_HEIGHT);
+         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_CUSTOM_HEIGHT);
          cVertex.Rotate(cAngle);
       }
       glEnd();
@@ -239,25 +237,25 @@ namespace argos {
    /****************************************/
 
    void CQTOpenGLKilobotCustom::RenderLED() {
-      CVector2 cVertex(KILOBOT_LED_RADIUS, 0.0f);
+      CVector2 cVertex(KILOBOT_CUSTOM_LED_RADIUS, 0.0f);
       CRadians cAngle(-CRadians::TWO_PI / m_unVertices);
       /* Bottom part */
       glBegin(GL_POLYGON);
       glNormal3f(0.0f, 0.0f, -1.0f);
       for(GLuint i = 0; i <= m_unVertices; i++) {
-         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_HEIGHT);
+         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_CUSTOM_HEIGHT);
          cVertex.Rotate(cAngle);
       }
       glEnd();
       /* Side surface */
       cAngle = -cAngle;
       CVector2 cNormal(1.0f, 0.0f);
-      cVertex.Set(KILOBOT_LED_RADIUS, 0.0f);
+      cVertex.Set(KILOBOT_CUSTOM_LED_RADIUS, 0.0f);
       glBegin(GL_QUAD_STRIP);
       for(GLuint i = 0; i <= m_unVertices; i++) {
          glNormal3f(cNormal.GetX(), cNormal.GetY(), 0.0f);
-         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_HEIGHT + KILOBOT_LED_HEIGHT);
-         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_HEIGHT);
+         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_CUSTOM_HEIGHT + KILOBOT_CUSTOM_LED_HEIGHT);
+         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_CUSTOM_HEIGHT);
          cVertex.Rotate(cAngle);
          cNormal.Rotate(cAngle);
       }
@@ -265,9 +263,9 @@ namespace argos {
       /* Top part */
       glBegin(GL_POLYGON);
       glNormal3f(0.0f, 0.0f, 1.0f);
-      cVertex.Set(KILOBOT_LED_RADIUS, 0.0f);
+      cVertex.Set(KILOBOT_CUSTOM_LED_RADIUS, 0.0f);
       for(GLuint i = 0; i <= m_unVertices; i++) {
-         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_HEIGHT + KILOBOT_LED_HEIGHT);
+         glVertex3f(cVertex.GetX(), cVertex.GetY(), KILOBOT_CUSTOM_HEIGHT + KILOBOT_CUSTOM_LED_HEIGHT);
          cVertex.Rotate(cAngle);
       }
       glEnd();

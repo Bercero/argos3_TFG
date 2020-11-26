@@ -1,5 +1,5 @@
 /**
- * @file <argos3/plugins/robots/kilobot/simulator/kilobot_custom_entity.h>
+ * @file <argos3/plugins/robots/kilobot_custom/simulator/kilobot_custom_entity.h>
  *
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  * @author Vito Trianni - <vito.trianni@istc.cnr.it>
@@ -14,7 +14,7 @@ namespace argos {
    class CKilobotCustomEntity;
    class CLEDEquippedEntity;
    class CLightSensorEquippedEntity;
-   class CKilobotCommunicationEntity;
+   class CKilobotCustomCommunicationEntity;
    class CGroundSensorEquippedEntity;
 }
 
@@ -63,8 +63,8 @@ namespace argos {
          return *m_pcLightSensorEquippedEntity;
       }
 
-      inline CKilobotCommunicationEntity& GetKilobotCommunicationEntity() {
-         return *m_pcKilobotCommunicationEntity;
+      inline CKilobotCustomCommunicationEntity& GetKilobotCustomCommunicationEntity() {
+         return *m_pcKilobotCustomCommunicationEntity;
       }
 
       inline CWheeledEntity& GetWheeledEntity() {
@@ -80,20 +80,18 @@ namespace argos {
       // }
 
       virtual std::string GetTypeDescription() const {
-         return "kilobot"; //TODO "kilobot_custom"
+         return "kilobot_custom";
       }
 
    private:
-     // CColor main_color;
 
-    CControllableEntity*         m_pcControllableEntity;
-    CEmbodiedEntity*             m_pcEmbodiedEntity;
-    CLEDEquippedEntity*          m_pcLEDEquippedEntity;
-    CLightSensorEquippedEntity*  m_pcLightSensorEquippedEntity;
-    CKilobotCommunicationEntity* m_pcKilobotCommunicationEntity;
-    CWheeledEntity*              m_pcWheeledEntity;
-    CGroundSensorEquippedEntity* m_pcGroundSensorEquippedEntity;
-
+      CControllableEntity*         m_pcControllableEntity;
+      CEmbodiedEntity*             m_pcEmbodiedEntity;
+      CLEDEquippedEntity*          m_pcLEDEquippedEntity;
+      CLightSensorEquippedEntity*  m_pcLightSensorEquippedEntity;
+      CKilobotCustomCommunicationEntity* m_pcKilobotCustomCommunicationEntity;
+      CWheeledEntity*              m_pcWheeledEntity;
+      CGroundSensorEquippedEntity* m_pcGroundSensorEquippedEntity;
    };
 
 }

@@ -1,4 +1,4 @@
-#include "kilobot_communication_default_actuator.h"
+#include "kilobot_custom_communication_default_actuator.h"
 #include <argos3/core/simulator/entity/composable_entity.h>
 #include <argos3/core/simulator/simulator.h>
 
@@ -7,46 +7,46 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationDefaultActuator::SetRobot(CComposableEntity& c_entity) {
-      m_pcCommEntity = &c_entity.GetComponent<CKilobotCommunicationEntity>("kilocomm");
+   void CKilobotCustomCommunicationDefaultActuator::SetRobot(CComposableEntity& c_entity) {
+      m_pcCommEntity = &c_entity.GetComponent<CKilobotCustomCommunicationEntity>("kilocomm");
       m_pcCommEntity->Enable();
    }
 
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationDefaultActuator::Update() {
+   void CKilobotCustomCommunicationDefaultActuator::Update() {
       m_pcCommEntity->SetTxMessage(m_ptMessage);
    }
 
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationDefaultActuator::Reset() {
+   void CKilobotCustomCommunicationDefaultActuator::Reset() {
    }
 
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationDefaultActuator::SetMessage(message_t* pt_msg) {
-      CCI_KilobotCommunicationActuator::SetMessage(pt_msg);
-      m_pcCommEntity->SetTxStatus(CKilobotCommunicationEntity::TX_ATTEMPT);
+   void CKilobotCustomCommunicationDefaultActuator::SetMessage(message_t* pt_msg) {
+      CCI_KilobotCustomCommunicationActuator::SetMessage(pt_msg);
+      m_pcCommEntity->SetTxStatus(CKilobotCustomCommunicationEntity::TX_ATTEMPT);
    }
 
    /****************************************/
    /****************************************/
 
-   REGISTER_ACTUATOR(CKilobotCommunicationDefaultActuator,
-                     "kilobot_communication", "default",
+   REGISTER_ACTUATOR(CKilobotCustomCommunicationDefaultActuator,
+                     "kilobot_custom_communication", "default",
                      "Carlo Pinciroli [ilpincy@gmail.com]",
                      "1.0",
-                     "The Kilobot communication actuator.",
-                     "This actuator allows Kilobots to perform situated communication, i.e., a form\n"
+                     "The KilobotCustom communication actuator.",
+                     "This actuator allows KilobotCustoms to perform situated communication, i.e., a form\n"
                      "of wireless communication whereby the receiver also knows the distance of the\n"
                      "sender.\n"
                      "To use this actuator, in controllers you must include the\n"
-                     "ci_kilobot_communication_actuator.h header.\n"
-                     "This actuator only allows a Kilobot to send messages. To receive messages, you\n"
+                     "ci_kilobot_custom_communication_actuator.h header.\n"
+                     "This actuator only allows a KilobotCustom to send messages. To receive messages, you\n"
                      "need the range-and-bearing sensor.\n\n"
                      "REQUIRED XML CONFIGURATION\n\n"
                      "  <controllers>\n"
@@ -55,7 +55,7 @@ namespace argos {
                      "      ...\n"
                      "      <actuators>\n"
                      "        ...\n"
-                     "        <kilobot_communication implementation=\"default\" />\n"
+                     "        <kilobot_custom_communication implementation=\"default\" />\n"
                      "        ...\n"
                      "      </actuators>\n"
                      "      ...\n"

@@ -21,9 +21,8 @@ include(ARGoSBuildChecks)
 include_directories(${CMAKE_SOURCE_DIR})
 
 # Descend into the following directories
-# add_subdirectory(behaviors)
 add_subdirectory(controllers)
 add_subdirectory(loop_functions)
 add_subdirectory(plugins)
-add_subdirectory(utility)
-add_subdirectory(pruebas)
+# add_subdirectory(utility)
+# add_subdirectory(pruebas)

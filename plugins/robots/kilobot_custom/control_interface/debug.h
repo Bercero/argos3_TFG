@@ -41,7 +41,7 @@ void debug_info_create() {
    debug_info_fd = shm_open(debug_info_fname, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
    // Check for errors
    if(debug_info_fd < 0) {
-      fprintf(stderr, "Opening the shared memory file of Kilobot %u: %s\n", kilo_uid, strerror(errno));
+      fprintf(stderr, "Opening the shared memory file of KilobotCustom %u: %s\n", kilo_uid, strerror(errno));
       exit(1);
    }
    // Resize debug shared memory area to contain the debug info, filling it with zeros */
@@ -55,7 +55,7 @@ void debug_info_create() {
                           debug_info_fd,
                           0);
    if(debug_info_shm == MAP_FAILED) {
-      fprintf(stderr, "Mmapping the shared memory area of kilobot %u: %s\n", kilo_uid, strerror(errno));
+      fprintf(stderr, "Mmapping the shared memory area of kilobot_custom %u: %s\n", kilo_uid, strerror(errno));
       close(debug_info_fd);
       shm_unlink(debug_info_fname);
       exit(1);

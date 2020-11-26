@@ -1,11 +1,11 @@
 /**
- * @file <argos3/plugins/robots/kilobot/simulator/kilobot_entity.cpp>
- *
+ * @file <argos3/plugins/robots/kilobot_custom/simulator/kilobot_custom_entity.cpp>
+ *TODO
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  */
 
 #include "kilobot_custom_entity.h"
-#include "kilobot_measures.h"
+#include "kilobot_custom_measures.h"
 
 #include <argos3/core/utility/math/matrix/rotationmatrix3.h>
 #include <argos3/core/simulator/space/space.h>
@@ -14,7 +14,7 @@
 #include <argos3/plugins/simulator/entities/led_equipped_entity.h>
 #include <argos3/plugins/simulator/entities/light_sensor_equipped_entity.h>
 #include <argos3/plugins/simulator/entities/ground_sensor_equipped_entity.h>
-#include <argos3/plugins/robots/kilobot/simulator/kilobot_communication_entity.h>
+#include <argos3/plugins/robots/kilobot_custom/simulator/kilobot_custom_communication_entity.h>
 
 namespace argos {
 
@@ -28,10 +28,9 @@ namespace argos {
       m_pcEmbodiedEntity(NULL),
       m_pcLEDEquippedEntity(NULL),
       m_pcLightSensorEquippedEntity(NULL),
-      m_pcKilobotCommunicationEntity(NULL),
+      m_pcKilobotCustomCommunicationEntity(NULL),
       m_pcWheeledEntity(NULL),
-      m_pcGroundSensorEquippedEntity(NULL)
- {
+      m_pcGroundSensorEquippedEntity(NULL){
    }
 
    /****************************************/
@@ -59,14 +58,14 @@ namespace argos {
           * Better to put this first, because many other entities need this one
           */
          m_pcEmbodiedEntity = new CEmbodiedEntity(this, "body_0", c_position, c_orientation);
-         SAnchor& cLightAnchor = m_pcEmbodiedEntity->AddAnchor("light", KILOBOT_LIGHT_SENSOR_OFFSET);
-         SAnchor& cCommAnchor = m_pcEmbodiedEntity->AddAnchor("comm", CVector3(0.0, 0.0, KILOBOT_RAB_ELEVATION));
+         SAnchor& cLightAnchor = m_pcEmbodiedEntity->AddAnchor("light", KILOBOT_CUSTOM_LIGHT_SENSOR_OFFSET);
+         SAnchor& cCommAnchor = m_pcEmbodiedEntity->AddAnchor("comm", CVector3(0.0, 0.0, KILOBOT_CUSTOM_RAB_ELEVATION));
          AddComponent(*m_pcEmbodiedEntity);
          /* Wheeled entity and wheel positions (left, right) */
          m_pcWheeledEntity = new CWheeledEntity(this, "wheels_0", 2);
          AddComponent(*m_pcWheeledEntity);
-         m_pcWheeledEntity->SetWheel(0, CVector3(0.0f,  KILOBOT_HALF_INTERPIN_DISTANCE, 0.0f), KILOBOT_PIN_WHEEL_RADIUS);
-         m_pcWheeledEntity->SetWheel(1, CVector3(0.0f, -KILOBOT_HALF_INTERPIN_DISTANCE, 0.0f), KILOBOT_PIN_WHEEL_RADIUS);
+         m_pcWheeledEntity->SetWheel(0, CVector3(0.0f,  KILOBOT_CUSTOM_HALF_INTERPIN_DISTANCE, 0.0f), KILOBOT_CUSTOM_PIN_WHEEL_RADIUS);
+         m_pcWheeledEntity->SetWheel(1, CVector3(0.0f, -KILOBOT_CUSTOM_HALF_INTERPIN_DISTANCE, 0.0f), KILOBOT_CUSTOM_PIN_WHEEL_RADIUS);
          /* LED equipped entity */
          m_pcLEDEquippedEntity = new CLEDEquippedEntity(this, "leds_0");
          AddComponent(*m_pcLEDEquippedEntity);
@@ -74,31 +73,30 @@ namespace argos {
          /* Light sensor equipped entity */
          m_pcLightSensorEquippedEntity = new CLightSensorEquippedEntity(this, "light_0");
          AddComponent(*m_pcLightSensorEquippedEntity);
-         m_pcLightSensorEquippedEntity->AddSensor(KILOBOT_LIGHT_SENSOR_OFFSET,
+         m_pcLightSensorEquippedEntity->AddSensor(KILOBOT_CUSTOM_LIGHT_SENSOR_OFFSET,
                                                   CVector3(0.0f, 0.0f, 1.0f),
-                                                  KILOBOT_LIGHT_SENSOR_RANGE,
+                                                  KILOBOT_CUSTOM_LIGHT_SENSOR_RANGE,
                                                   cLightAnchor);
-         /* Kilobot communication entity */
-         m_pcKilobotCommunicationEntity =
-            new CKilobotCommunicationEntity(this,
+         /* KilobotCustom communication entity */
+         m_pcKilobotCustomCommunicationEntity =
+            new CKilobotCustomCommunicationEntity(this,
                                             "kilocomm_0",
                                             9,
                                             f_communication_range,
                                             cCommAnchor,
                                             *m_pcEmbodiedEntity);
-         AddComponent(*m_pcKilobotCommunicationEntity);
-
+         AddComponent(*m_pcKilobotCustomCommunicationEntity);
          /* Ground sensor equipped entity */
          m_pcGroundSensorEquippedEntity =
             new CGroundSensorEquippedEntity(this, "ground_0");
          AddComponent(*m_pcGroundSensorEquippedEntity);
+         //TODO usar valores de KILOBOT_GROUND_SENSOR_0_OFFSET
          m_pcGroundSensorEquippedEntity->AddSensor(CVector2(0.0, 0.0),
                                                    CGroundSensorEquippedEntity::TYPE_BLACK_WHITE,
                                                    m_pcEmbodiedEntity->GetOriginAnchor());
          m_pcGroundSensorEquippedEntity->AddSensor(CVector2(0.0, 0.01),
                                                    CGroundSensorEquippedEntity::TYPE_GRAYSCALE,
                                                    m_pcEmbodiedEntity->GetOriginAnchor());
-
          /* Controllable entity.  It must be the last one, for
             actuators/sensors to link to composing entities
             correctly */
@@ -131,13 +129,13 @@ namespace argos {
          AddComponent(*m_pcEmbodiedEntity);
          m_pcEmbodiedEntity->Init(GetNode(t_tree, "body"));
          /* Create an anchor for the light sensor - must be done after initializing the body */
-         SAnchor& cLightAnchor = m_pcEmbodiedEntity->AddAnchor("light", KILOBOT_LIGHT_SENSOR_OFFSET);
-         SAnchor& cCommAnchor = m_pcEmbodiedEntity->AddAnchor("comm", CVector3(0.0, 0.0, KILOBOT_RAB_ELEVATION));
+         SAnchor& cLightAnchor = m_pcEmbodiedEntity->AddAnchor("light", KILOBOT_CUSTOM_LIGHT_SENSOR_OFFSET);
+         SAnchor& cCommAnchor = m_pcEmbodiedEntity->AddAnchor("comm", CVector3(0.0, 0.0, KILOBOT_CUSTOM_RAB_ELEVATION));
          /* Wheeled entity and wheel positions (left, right) */
          m_pcWheeledEntity = new CWheeledEntity(this, "wheels_0", 2);
          AddComponent(*m_pcWheeledEntity);
-         m_pcWheeledEntity->SetWheel(0, CVector3(0.0f,  KILOBOT_HALF_INTERPIN_DISTANCE, 0.0f), KILOBOT_PIN_WHEEL_RADIUS);
-         m_pcWheeledEntity->SetWheel(1, CVector3(0.0f, -KILOBOT_HALF_INTERPIN_DISTANCE, 0.0f), KILOBOT_PIN_WHEEL_RADIUS);
+         m_pcWheeledEntity->SetWheel(0, CVector3(0.0f,  KILOBOT_CUSTOM_HALF_INTERPIN_DISTANCE, 0.0f), KILOBOT_CUSTOM_PIN_WHEEL_RADIUS);
+         m_pcWheeledEntity->SetWheel(1, CVector3(0.0f, -KILOBOT_CUSTOM_HALF_INTERPIN_DISTANCE, 0.0f), KILOBOT_CUSTOM_PIN_WHEEL_RADIUS);
          /* LED equipped entity */
          m_pcLEDEquippedEntity = new CLEDEquippedEntity(this, "leds_0");
          AddComponent(*m_pcLEDEquippedEntity);
@@ -145,33 +143,31 @@ namespace argos {
          /* Light sensor equipped entity */
          m_pcLightSensorEquippedEntity = new CLightSensorEquippedEntity(this, "light_0");
          AddComponent(*m_pcLightSensorEquippedEntity);
-         m_pcLightSensorEquippedEntity->AddSensor(KILOBOT_LIGHT_SENSOR_OFFSET,
+         m_pcLightSensorEquippedEntity->AddSensor(KILOBOT_CUSTOM_LIGHT_SENSOR_OFFSET,
                                                   CVector3(0.0f,0.0f,1.0f),
-                                                  KILOBOT_LIGHT_SENSOR_RANGE,
+                                                  KILOBOT_CUSTOM_LIGHT_SENSOR_RANGE,
                                                   cLightAnchor);
-         /* Kilobot communication entity */
+         /* KilobotCustom communication entity */
          Real fRange = 0.1f;
          GetNodeAttributeOrDefault(t_tree, "communication_range", fRange, fRange);
-         m_pcKilobotCommunicationEntity =
-            new CKilobotCommunicationEntity(this,
+         m_pcKilobotCustomCommunicationEntity =
+            new CKilobotCustomCommunicationEntity(this,
                                             "kilocomm_0",
                                             9,
                                             fRange,
                                             cCommAnchor,
                                             *m_pcEmbodiedEntity);
-         AddComponent(*m_pcKilobotCommunicationEntity);
-
+         AddComponent(*m_pcKilobotCustomCommunicationEntity);
          /* Ground sensor equipped entity */
          m_pcGroundSensorEquippedEntity =
             new CGroundSensorEquippedEntity(this, "ground_0");
          AddComponent(*m_pcGroundSensorEquippedEntity);
-         m_pcGroundSensorEquippedEntity->AddSensor(KILOBOT_GROUND_SENSOR_0_OFFSET,
+         m_pcGroundSensorEquippedEntity->AddSensor(KILOBOT_CUSTOM_GROUND_SENSOR_0_OFFSET,
                                                    CGroundSensorEquippedEntity::TYPE_BLACK_WHITE,
                                                    m_pcEmbodiedEntity->GetOriginAnchor());
-         m_pcGroundSensorEquippedEntity->AddSensor(KILOBOT_GROUND_SENSOR_1_OFFSET,
+         m_pcGroundSensorEquippedEntity->AddSensor(KILOBOT_CUSTOM_GROUND_SENSOR_1_OFFSET,
                                                    CGroundSensorEquippedEntity::TYPE_GRAYSCALE,
                                                    m_pcEmbodiedEntity->GetOriginAnchor());
-
          /* Controllable entity. It must be the last one, for
             actuators/sensors to link to composing entities
             correctly */
@@ -209,7 +205,7 @@ namespace argos {
 #define UPDATE(COMPONENT) if(COMPONENT->IsEnabled()) COMPONENT->Update();
 
    void CKilobotCustomEntity::UpdateComponents() {
-      UPDATE(m_pcKilobotCommunicationEntity);
+      UPDATE(m_pcKilobotCustomCommunicationEntity);
       UPDATE(m_pcLEDEquippedEntity);
    }
 

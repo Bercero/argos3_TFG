@@ -1,10 +1,10 @@
 /**
- * @file <argos3/plugins/robots/foot-bot/control_interface/ci_kilobot_communication_actuator.cpp>
+ * @file <argos3/plugins/robots/foot-bot/control_interface/ci_kilobot_custom_communication_actuator.cpp>
  *
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  */
 
-#include "ci_kilobot_communication_actuator.h"
+#include "ci_kilobot_custom_communication_actuator.h"
 
 #ifdef ARGOS_WITH_LUA
 #include <argos3/core/wrappers/lua/lua_utility.h>
@@ -15,13 +15,13 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CCI_KilobotCommunicationActuator::CCI_KilobotCommunicationActuator() {
+   CCI_KilobotCustomCommunicationActuator::CCI_KilobotCustomCommunicationActuator() {
    }
 
    /****************************************/
    /****************************************/
 
-   void CCI_KilobotCommunicationActuator::SetMessage(message_t* pt_msg) {
+   void CCI_KilobotCustomCommunicationActuator::SetMessage(message_t* pt_msg) {
       m_ptMessage = pt_msg;
    }
 
@@ -29,7 +29,7 @@ namespace argos {
    /****************************************/
 
 #ifdef ARGOS_WITH_LUA
-   void CCI_KilobotCommunicationActuator::CreateLuaState(lua_State* pt_lua_state) {
+   void CCI_KilobotCustomCommunicationActuator::CreateLuaState(lua_State* pt_lua_state) {
       // TODO
    }
 #endif

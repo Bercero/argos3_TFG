@@ -1,24 +1,24 @@
 /**
- * @file <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_controller.h>
+ * @file <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_custom_controller.h>
  *
- * @brief This file provides the definition of the kilobot controller.
+ * @brief This file provides the definition of the kilobot_custom controller.
  *
- * This file provides the definition of the kilobot controller.
+ * This file provides the definition of the kilobot_custom controller.
  *
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  */
 
-#ifndef CCI_KILOBOT_CONTROLLER_H
-#define CCI_KILOBOT_CONTROLLER_H
+#ifndef CCI_KILOBOT_CUSTOM_CONTROLLER_H
+#define CCI_KILOBOT_CUSTOM_CONTROLLER_H
 
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/rng.h>
-#include <argos3/plugins/robots/kilobot/control_interface/kilolib.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/kilolib.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_led_actuator.h>
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_light_sensor.h>
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_communication_actuator.h>
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_communication_sensor.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_custom_led_actuator.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_custom_light_sensor.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_custom_communication_actuator.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_custom_communication_sensor.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/mman.h>
@@ -31,12 +31,12 @@
 
 using namespace argos;
 
-class CCI_KilobotController : public CCI_Controller {
+class CCI_KilobotCustomController : public CCI_Controller {
 
 public:
 
-   CCI_KilobotController();
-   virtual ~CCI_KilobotController() {}
+   CCI_KilobotCustomController();
+   virtual ~CCI_KilobotCustomController() {}
 
    virtual void Init(TConfigurationNode& t_tree);
 
@@ -54,7 +54,7 @@ public:
       return m_tBehaviorPID;
    }
 
-   kilobot_state_t* GetRobotState() {
+   kilobot_custom_state_t* GetRobotState() {
       return m_ptRobotState;
    }
 
@@ -103,22 +103,22 @@ protected:
 private:
 
    /** Pointer to the shared memory area */
-   kilobot_state_t* m_ptRobotState;
+   kilobot_custom_state_t* m_ptRobotState;
 
    /** Pointer to the motor actuator */
    CCI_DifferentialSteeringActuator* m_pcMotors;
 
    /** Pointer to LED actuator */
-   CCI_KilobotLEDActuator* m_pcLED;
+   CCI_KilobotCustomLEDActuator* m_pcLED;
 
    /** Pointer to the light sensor */
-   CCI_KilobotLightSensor* m_pcLight;
+   CCI_KilobotCustomLightSensor* m_pcLight;
 
    /** Pointer to the communication actuator */
-   CCI_KilobotCommunicationActuator* m_pcCommA;
+   CCI_KilobotCustomCommunicationActuator* m_pcCommA;
 
    /** Pointer to the communication sensor */
-   CCI_KilobotCommunicationSensor* m_pcCommS;
+   CCI_KilobotCustomCommunicationSensor* m_pcCommS;
 
    /* The random number generator */
    CRandom::CRNG* m_pcRNG;

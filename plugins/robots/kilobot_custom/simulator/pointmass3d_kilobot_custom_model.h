@@ -1,32 +1,32 @@
 /**
- * @file <argos3/plugins/simulator/robots/kilo-bot/simulator/pointmass3d/pointmass3d_kilobot_model.h>
+ * @file <argos3/plugins/simulator/robots/kilo-bot/simulator/pointmass3d/pointmass3d_kilobot_custom_model.h>
  *
  * @author Carlo Pinciroli - <cpinciro@ulb.ac.be>
  */
 
-#ifndef POINTMASS3D_KILOBOT_H
-#define POINTMASS3D_KILOBOT_H
+#ifndef POINTMASS3D_KILOBOT_CUSTOM_H
+#define POINTMASS3D_KILOBOT_CUSTOM_H
 
 namespace argos {
    class CPointMass3DEngine;
-   class CPointMass3DKilobotModel;
+   class CPointMass3DKilobotCustomModel;
    class CKilobotCustomEntity;
 }
 
 #include <argos3/plugins/simulator/physics_engines/pointmass3d/pointmass3d_model.h>
 #include <argos3/core/simulator/entity/embodied_entity.h>
-#include "kilobot_custom_entity.h"
+#include <argos3/plugins/robots/kilobot_custom/simulator/kilobot_custom_entity.h>
 
 namespace argos {
 
-   class CPointMass3DKilobotModel : public CPointMass3DModel {
+   class CPointMass3DKilobotCustomModel : public CPointMass3DModel {
 
    public:
 
-      CPointMass3DKilobotModel(CPointMass3DEngine& c_engine,
-                               CKilobotCustomEntity& c_kilobot);
+      CPointMass3DKilobotCustomModel(CPointMass3DEngine& c_engine,
+                               CKilobotCustomEntity& c_kilobot_custom);
 
-      virtual ~CPointMass3DKilobotModel() {}
+      virtual ~CPointMass3DKilobotCustomModel() {}
 
       virtual void Reset();
 

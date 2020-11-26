@@ -1,11 +1,11 @@
-#include "ci_kilobot_controller.h"
+#include "ci_kilobot_custom_controller.h"
 #include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/core/simulator/physics_engine/physics_engine.h>
 
 /****************************************/
 /****************************************/
 
-CCI_KilobotController::CCI_KilobotController() :
+CCI_KilobotCustomController::CCI_KilobotCustomController() :
    m_ptRobotState(NULL),
    m_pcMotors(NULL),
    m_pcLED(NULL),
@@ -20,23 +20,23 @@ CCI_KilobotController::CCI_KilobotController() :
 /****************************************/
 /****************************************/
 
-void CCI_KilobotController::Init(TConfigurationNode& t_tree) {
+void CCI_KilobotCustomController::Init(TConfigurationNode& t_tree) {
    try {
       /* Initialize devices */
       try {
          m_pcMotors = GetActuator<CCI_DifferentialSteeringActuator>("differential_steering");
       } catch(CARGoSException&) {}
       try {
-         m_pcLED    = GetActuator<CCI_KilobotLEDActuator          >("kilobot_led"          );
+         m_pcLED    = GetActuator<CCI_KilobotCustomLEDActuator          >("kilobot_custom_led"          );
       } catch(CARGoSException&) {}
       try {
-         m_pcCommA  = GetActuator<CCI_KilobotCommunicationActuator>("kilobot_communication");
+         m_pcCommA  = GetActuator<CCI_KilobotCustomCommunicationActuator>("kilobot_custom_communication");
       } catch(CARGoSException&) {}
       try {
-         m_pcCommS  = GetSensor  <CCI_KilobotCommunicationSensor  >("kilobot_communication");
+         m_pcCommS  = GetSensor  <CCI_KilobotCustomCommunicationSensor  >("kilobot_custom_communication");
       } catch(CARGoSException&) {}
       try {
-         m_pcLight  = GetSensor  <CCI_KilobotLightSensor          >("kilobot_light"        );
+         m_pcLight  = GetSensor  <CCI_KilobotCustomLightSensor          >("kilobot_custom_light"        );
       } catch(CARGoSException&) {}
       /* Create a random number generator */
       m_pcRNG = CRandom::CreateRNG("argos");
@@ -56,11 +56,11 @@ void CCI_KilobotController::Init(TConfigurationNode& t_tree) {
          THROW_ARGOSEXCEPTION("Creating a shared memory area for " << GetId() << ": " << ::strerror(errno));
       }
       /* Resize shared memory area to contain the robot state */
-      ::ftruncate(m_nSharedMemFD, sizeof(kilobot_state_t));
+      ::ftruncate(m_nSharedMemFD, sizeof(kilobot_custom_state_t));
       /* Get pointer to shared memory area */
-      m_ptRobotState = reinterpret_cast<kilobot_state_t*>(
+      m_ptRobotState = reinterpret_cast<kilobot_custom_state_t*>(
          ::mmap(NULL,
-                sizeof(kilobot_state_t),
+                sizeof(kilobot_custom_state_t),
                 PROT_READ | PROT_WRITE,
                 MAP_SHARED,
                 m_nSharedMemFD,
@@ -72,21 +72,21 @@ void CCI_KilobotController::Init(TConfigurationNode& t_tree) {
       CreateBehavior();
    }
    catch(CARGoSException& ex) {
-      THROW_ARGOSEXCEPTION_NESTED("Error initializing the Kilobot controller for robot " << GetId(), ex);
+      THROW_ARGOSEXCEPTION_NESTED("Error initializing the KilobotCustom controller for robot " << GetId(), ex);
    }
 }
 
 /****************************************/
 /****************************************/
 
-void CCI_KilobotController::ControlStep() {
+void CCI_KilobotCustomController::ControlStep() {
    /* Set light reading */
    if(m_pcLight)
       m_ptRobotState->ambientlight = m_pcLight->GetReading();
    /* Set received message */
    if(m_pcCommS) {
       if(!m_pcCommS->GetPackets().empty()) {
-         m_ptRobotState->rx_state = Min<UInt8>(m_pcCommS->GetPackets().size(), KILOBOT_MAX_RX);
+         m_ptRobotState->rx_state = Min<UInt8>(m_pcCommS->GetPackets().size(), KILOBOT_CUSTOM_MAX_RX);
          for(size_t i = 0; i < m_ptRobotState->rx_state; ++i) {
             ::memcpy(&m_ptRobotState->rx_message[i],
                      m_pcCommS->GetPackets()[i].Message,
@@ -127,28 +127,28 @@ void CCI_KilobotController::ControlStep() {
 /****************************************/
 /****************************************/
 
-void CCI_KilobotController::Reset() {
-   /* Kill kilobot process */
+void CCI_KilobotCustomController::Reset() {
+   /* Kill kilobot_custom process */
    ::kill(m_tBehaviorPID, SIGTERM);
    int nStatus;
    ::waitpid(m_tBehaviorPID, &nStatus, WIFEXITED(nStatus));
-   /* Restart kilobot process */
+   /* Restart kilobot_custom process */
    CreateBehavior();
 }
 
 /****************************************/
 /****************************************/
 
-void CCI_KilobotController::Destroy() {
+void CCI_KilobotCustomController::Destroy() {
    DestroyBehavior();
 }
 
 /****************************************/
 /****************************************/
 
-void CCI_KilobotController::CreateBehavior() {
+void CCI_KilobotCustomController::CreateBehavior() {
    /* Zero the robot state */
-   ::memset(m_ptRobotState, 0, sizeof(kilobot_state_t));
+   ::memset(m_ptRobotState, 0, sizeof(kilobot_custom_state_t));
    /* Fork this process */
    pid_t tParentPID = getpid();
    m_tBehaviorPID = ::fork();
@@ -175,12 +175,12 @@ void CCI_KilobotController::CreateBehavior() {
 /****************************************/
 /****************************************/
 
-void CCI_KilobotController::DestroyBehavior() {
+void CCI_KilobotCustomController::DestroyBehavior() {
    ::kill(m_tBehaviorPID, SIGTERM);
    ::kill(m_tBehaviorPID, SIGCONT);
    int nStatus;
    ::waitpid(m_tBehaviorPID, &nStatus, WIFEXITED(nStatus));
-   munmap(m_ptRobotState, sizeof(kilobot_state_t));
+   munmap(m_ptRobotState, sizeof(kilobot_custom_state_t));
    close(m_nSharedMemFD);
    pid_t tParentPID = getpid();
    ::shm_unlink(("/" + ToString<pid_t>(tParentPID) + "_" + GetId()).c_str());
@@ -189,4 +189,4 @@ void CCI_KilobotController::DestroyBehavior() {
 /****************************************/
 /****************************************/
 
-REGISTER_CONTROLLER(CCI_KilobotController, "kilobot_controller");
+REGISTER_CONTROLLER(CCI_KilobotCustomController, "kilobot_custom_controller");
