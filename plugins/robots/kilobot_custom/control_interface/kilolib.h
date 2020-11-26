@@ -3,31 +3,31 @@
 
 /**
  * @file kilolib.h
- * @mainpage Kilobot Library API
+ * @mainpage KilobotCustom Library API
  *
- * At its core the Kilobot Library library provides the function
- * kilo_init() to initialize the hardware of the kilobots, and the
+ * At its core the KilobotCustom Library library provides the function
+ * kilo_init() to initialize the hardware of the kilobot_customs, and the
  * function kilo_start() that uses a basic event loop programming
  * paradigm (this relies on a setup and a loop callback, similar to
  * those used in the arduino software).
  *
  * The API also provides functions to read the various sensors available
- * to the kilobots (get_ambientlight(), get_voltage(), get_temperature()), and
+ * to the kilobot_customs (get_ambientlight(), get_voltage(), get_temperature()), and
  * also to control the individual pager motors and the RGB led present
- * in each kilobot (set_motors(), set_color()).
+ * in each kilobot_custom (set_motors(), set_color()).
  *
  * The user can register callbacks to interact with the messaging
  * subsystem. There are callbacks for the events of message reception
  * (::kilo_message_rx), message transmission (::kilo_message_tx), and
  * notification of successful transmission (::kilo_message_tx_success).
- * By default every kilobot attempts to send message twice per second.
+ * By default every kilobot_custom attempts to send message twice per second.
  * Advanced users can modify this through the `kilo_tx_period` variable,
  * although this is discouraged unless you know what you are doing.
  *
- * To prevent collisions the kilobot library uses a basic exponential
+ * To prevent collisions the kilobot_custom library uses a basic exponential
  * back-off strategy with carrier sensing. There are no acknowledgement
  * packets, and as such a message is considered to be successfully
- * transmitted when a kilobot is able transmit a message without
+ * transmitted when a kilobot_custom is able transmit a message without
  * detecting any contention in the channel.
  */
 
@@ -45,12 +45,12 @@
  * Redefine the 'main' symbol so, in the behavior code, the main of the robot is not called first.
  * The actual main() is in kilolib.c.
  */
-#define main __kilobot_main
+#define main __kilobot_custom_main
 
 /**
  * @brief Distance measurement.
  *
- * Every time a message is received by a kilobot, it collects two 10 bit
+ * Every time a message is received by a kilobot_custom, it collects two 10 bit
  * measurements that represent the signal strength of the received
  * message after going through an operational amplifier. This data
  * structure stores these two measurements.
@@ -69,11 +69,11 @@ typedef message_t *(*message_tx_t)(void);
 typedef void (*message_tx_success_t)(void);
 
 /**
- * @brief Kilobot clock variable.
+ * @brief KilobotCustom clock variable.
  *
  * This variable holds a 32-bit unsigned positive integer. This variable
- * is initialized to zero whenever the program run at the kilobot is
- * reset (or when the kilobot is first turned on). It is incremented
+ * is initialized to zero whenever the program run at the kilobot_custom is
+ * reset (or when the kilobot_custom is first turned on). It is incremented
  * approximately 32 times per second, or once every 30ms. 
  *
  * @code
@@ -101,14 +101,14 @@ typedef void (*message_tx_success_t)(void);
  * @endcode
  */
 
-extern char* kilo_str_id; // kilobot id as string
+extern char* kilo_str_id; // kilobot_custom id as string
 extern uint32_t kilo_ticks;
 extern uint16_t kilo_tx_period;
 /**
- * @brief Kilobot unique identifier.
+ * @brief KilobotCustom unique identifier.
  *
  * This variable holds a 16-bit positive integer which is designated as
- * the kilobot's unique identifier during calibration.
+ * the kilobot_custom's unique identifier during calibration.
  */
 extern uint16_t kilo_uid;
 /**
@@ -284,7 +284,7 @@ extern "C" {
  * @return Positive integer with distance estimate in mm.
  *
  * @note Internally this function relies on a distance calibration table
- * stored on the EEPROM memory of the kilobots. This table is populated
+ * stored on the EEPROM memory of the kilobot_customs. This table is populated
  * using a special calibration rig. Robots purchased from Kteam come
  * precalibrated.
  */
@@ -302,7 +302,7 @@ uint8_t estimate_distance(const distance_measurement_t *d);
  * milliseconds in a second).
  *
  * @note While its easy to create short delays in the program execution
- * using this function, the processor of the kilobot cannot perform
+ * using this function, the processor of the kilobot_custom cannot perform
  * other tasks during this delay functions. In general its preferable to
  * use timers to create delays.
  * @see kilo_ticks
@@ -351,10 +351,10 @@ void rand_seed(uint8_t seed);
  *
  * This function returns a 10-bit measurement (0 to 1023) that
  * represents the amount of ambient light detected by the photo diode
- * available in the kilobot.
+ * available in the kilobot_custom.
  *
  * @return 10-bit measurement of ambient light.
- * @note All measurements in the kilobot are performed using the same
+ * @note All measurements in the kilobot_custom are performed using the same
  * analog-to-digital conversion (ADC) unit of the AVR processor. This
  * ADC unit requires a certain amount of time to change the source of
  * the measurement. As such, if a message is received while the ambient
@@ -369,22 +369,22 @@ int16_t get_ambientlight();
  *
  * This function returns a 10-bit measurement (0 to 1023) that
  * represents the amount of voltage that remains in the battery. It can
- * be used to determine if the kilobot should be recharged.
+ * be used to determine if the kilobot_custom should be recharged.
  *
  * @return 10-bit measurement of battery voltage.
  */
 int16_t get_voltage();
 
 /**
- * @brief Read the temperature of the kilobot.
+ * @brief Read the temperature of the kilobot_custom.
  *
  * This function returns a 10-bit measurement (0 to 1023) that
- * represents the temperature of the board of the kilobot. This sensor
+ * represents the temperature of the board of the kilobot_custom. This sensor
  * is only capable of detecting large temperature changes (in the order
  * of 2 Celsius degrees or more).
  *
  * As such, it is only useful only to detect drastic changes in the
- * operating environment of the kilobot.
+ * operating environment of the kilobot_custom.
  */
 int16_t get_temperature();
 
@@ -418,7 +418,7 @@ int16_t get_temperature();
  * // spin up left motor for 15ms
  * set_motors(255, 0);
  * delay(15);
- * // turn the kilobot left for 2 seconds
+ * // turn the kilobot_custom left for 2 seconds
  * set_motors(kilo_turn_left, 0);
  * delay(2000);
  * // go straight for 2 seconds
@@ -464,7 +464,7 @@ void spinup_motors();
  * @brief Set the output of the RGB led.
  *
  * This function receives an 8-bit unsigned integer whose bits are used
- * to determine the output of the RGB led mounted on the kilobot. Each
+ * to determine the output of the RGB led mounted on the kilobot_custom. Each
  * color has a 2-bit resolution which allows set each color channel
  * independently from off (0) to full-brightness (3).
  *
@@ -490,9 +490,9 @@ void spinup_motors();
 void set_color(uint8_t color);
 
 /**
- * @brief Initialize kilobot hardware.
+ * @brief Initialize kilobot_custom hardware.
  *
- * This function initializes all hardware of the kilobots. This includes
+ * This function initializes all hardware of the kilobot_customs. This includes
  * calibrating the hardware oscillator, setting hardware timers,
  * configuring ports, setting up analog-to-digital converters,
  * registering system interrupts and the initializing the messaging
@@ -504,7 +504,7 @@ void set_color(uint8_t color);
 void kilo_init();
 
 /**
- * @brief Start kilobot event loop.
+ * @brief Start kilobot_custom event loop.
  *
  * This function receives two parameters. The first parameter @p setup
  * is a function which will be called once to perform any initialization
@@ -542,23 +542,23 @@ void kilo_start(void (*setup)(void), void (*loop)(void));
 
 
 /**
- * Maximum number of messages received by a Kilobot in a timestep
+ * Maximum number of messages received by a KilobotCustom in a timestep
  */
-#define KILOBOT_MAX_RX 4
+#define KILOBOT_CUSTOM_MAX_RX 4
 
 /**
- * @brief Kilobot state, used for communication with ARGoS.
+ * @brief KilobotCustom state, used for communication with ARGoS.
  *
- * This data structure is used by ARGoS and by the Kilobot behavior to communicate.
- * The structure contains the status of the sensors and actuators of the Kilobot.
+ * This data structure is used by ARGoS and by the KilobotCustom behavior to communicate.
+ * The structure contains the status of the sensors and actuators of the KilobotCustom.
  *
  * Do not use this in your own programs.
  */
 typedef struct {
    message_t              tx_message;     // the message to send
    uint8_t                tx_state;       // 0 = none, 1 = sending, 2 = sent
-   message_t              rx_message[KILOBOT_MAX_RX];  // the received messages
-   distance_measurement_t rx_distance[KILOBOT_MAX_RX]; // distance of message sources
+   message_t              rx_message[KILOBOT_CUSTOM_MAX_RX];  // the received messages
+   distance_measurement_t rx_distance[KILOBOT_CUSTOM_MAX_RX]; // distance of message sources
    uint8_t                rx_state;       // 0 = none, >0 # of received messages
    int16_t                ambientlight;   // used by get_ambientlight()
    int16_t                voltage;        // used by get_voltage()
@@ -566,7 +566,7 @@ typedef struct {
    uint8_t                left_motor;     // used by set_motors()
    uint8_t                right_motor;    // used by set_motors()
    uint8_t                color;          // used by set_color()
-} kilobot_state_t;
+} kilobot_custom_state_t;
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 }

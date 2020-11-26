@@ -2,8 +2,8 @@
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  */
 
-#include "kilobot_communication_entity.h"
-#include "kilobot_communication_medium.h"
+#include "kilobot_custom_communication_entity.h"
+#include "kilobot_custom_communication_medium.h"
 #include <argos3/core/utility/string_utilities.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/simulator/space/space.h>
@@ -15,7 +15,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CKilobotCommunicationEntity::CKilobotCommunicationEntity(CComposableEntity* pc_parent,
+   CKilobotCustomCommunicationEntity::CKilobotCustomCommunicationEntity(CComposableEntity* pc_parent,
                                                             const std::string& str_id,
                                                             size_t un_msg_size,
                                                             Real f_range,
@@ -38,14 +38,14 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationEntity::Reset() {
+   void CKilobotCustomCommunicationEntity::Reset() {
       m_eTxStatus = TX_NONE;
    }
 
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationEntity::Update() {
+   void CKilobotCustomCommunicationEntity::Update() {
       if(m_eTxStatus == TX_SUCCESS) m_eTxStatus = TX_NONE;
       SetPosition(m_psAnchor->Position);
       SetOrientation(m_psAnchor->Orientation);
@@ -54,7 +54,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationEntity::SetEnabled(bool b_enabled) {
+   void CKilobotCustomCommunicationEntity::SetEnabled(bool b_enabled) {
       /* Perform generic enable behavior */
       CEntity::SetEnabled(b_enabled);
       /* Perform specific enable behavior */
@@ -79,30 +79,30 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   bool CKilobotCommunicationEntity::HasMedium() const {
+   bool CKilobotCustomCommunicationEntity::HasMedium() const {
       return m_pcMedium != NULL;
    }
 
    /****************************************/
    /****************************************/
 
-   CKilobotCommunicationMedium& CKilobotCommunicationEntity::GetMedium() {
+   CKilobotCustomCommunicationMedium& CKilobotCustomCommunicationEntity::GetMedium() {
       return *m_pcMedium;
    }
 
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationEntity::SetMedium(CKilobotCommunicationMedium& c_medium) {
+   void CKilobotCustomCommunicationEntity::SetMedium(CKilobotCustomCommunicationMedium& c_medium) {
       m_pcMedium = &c_medium;
    }
 
    /****************************************/
    /****************************************/
 
-   void CKilobotCommunicationEntitySpaceHashUpdater::operator()(CAbstractSpaceHash<CKilobotCommunicationEntity>& c_space_hash,
-                                                       CKilobotCommunicationEntity& c_element) {
-      /* Calculate the position of the center of the kilobot communication entity in the space hash */
+   void CKilobotCustomCommunicationEntitySpaceHashUpdater::operator()(CAbstractSpaceHash<CKilobotCustomCommunicationEntity>& c_space_hash,
+                                                       CKilobotCustomCommunicationEntity& c_element) {
+      /* Calculate the position of the center of the kilobot_custom communication entity in the space hash */
       c_space_hash.SpaceToHashTable(m_nCenterI,
                                     m_nCenterJ,
                                     m_nCenterK,
@@ -253,9 +253,9 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   class CSpaceOperationAddCKilobotCommunicationEntity : public CSpaceOperationAddEntity {
+   class CSpaceOperationAddCKilobotCustomCommunicationEntity : public CSpaceOperationAddEntity {
    public:
-      void ApplyTo(CSpace& c_space, CKilobotCommunicationEntity& c_entity) {
+      void ApplyTo(CSpace& c_space, CKilobotCustomCommunicationEntity& c_entity) {
          /* Add entity to space - this ensures that the RAB entity
           * gets an id before being added to the RAB medium */
          c_space.AddEntity(c_entity);
@@ -265,9 +265,9 @@ namespace argos {
       }
    };
 
-   class CSpaceOperationRemoveCKilobotCommunicationEntity : public CSpaceOperationRemoveEntity {
+   class CSpaceOperationRemoveCKilobotCustomCommunicationEntity : public CSpaceOperationRemoveEntity {
    public:
-      void ApplyTo(CSpace& c_space, CKilobotCommunicationEntity& c_entity) {
+      void ApplyTo(CSpace& c_space, CKilobotCustomCommunicationEntity& c_entity) {
          /* Disable the entity - this ensures that the entity is
           * removed from the RAB medium */
          c_entity.Disable();
@@ -276,34 +276,34 @@ namespace argos {
       }
    };
 
-   REGISTER_SPACE_OPERATION(CSpaceOperationAddEntity, CSpaceOperationAddCKilobotCommunicationEntity, CKilobotCommunicationEntity);
-   REGISTER_SPACE_OPERATION(CSpaceOperationRemoveEntity, CSpaceOperationRemoveCKilobotCommunicationEntity, CKilobotCommunicationEntity);
+   REGISTER_SPACE_OPERATION(CSpaceOperationAddEntity, CSpaceOperationAddCKilobotCustomCommunicationEntity, CKilobotCustomCommunicationEntity);
+   REGISTER_SPACE_OPERATION(CSpaceOperationRemoveEntity, CSpaceOperationRemoveCKilobotCustomCommunicationEntity, CKilobotCustomCommunicationEntity);
 
    /****************************************/
    /****************************************/
 
-   CKilobotCommunicationEntityGridCellUpdater::CKilobotCommunicationEntityGridCellUpdater(CGrid<CKilobotCommunicationEntity>& c_grid) :
+   CKilobotCustomCommunicationEntityGridCellUpdater::CKilobotCustomCommunicationEntityGridCellUpdater(CGrid<CKilobotCustomCommunicationEntity>& c_grid) :
       m_cGrid(c_grid) {}
    
-   bool CKilobotCommunicationEntityGridCellUpdater::operator()(SInt32 n_i,
+   bool CKilobotCustomCommunicationEntityGridCellUpdater::operator()(SInt32 n_i,
                                                       SInt32 n_j,
                                                       SInt32 n_k,
-                                                      CGrid<CKilobotCommunicationEntity>::SCell& s_cell) {
+                                                      CGrid<CKilobotCustomCommunicationEntity>::SCell& s_cell) {
       /* Update cell */
       m_cGrid.UpdateCell(n_i, n_j, n_k, *m_pcEntity);
       /* Continue with other cells */
       return true;
    }
    
-   void CKilobotCommunicationEntityGridCellUpdater::SetEntity(CKilobotCommunicationEntity& c_entity) {
+   void CKilobotCustomCommunicationEntityGridCellUpdater::SetEntity(CKilobotCustomCommunicationEntity& c_entity) {
       m_pcEntity = &c_entity;
    }
 
-   CKilobotCommunicationEntityGridEntityUpdater::CKilobotCommunicationEntityGridEntityUpdater(CGrid<CKilobotCommunicationEntity>& c_grid) :
+   CKilobotCustomCommunicationEntityGridEntityUpdater::CKilobotCustomCommunicationEntityGridEntityUpdater(CGrid<CKilobotCustomCommunicationEntity>& c_grid) :
       m_cGrid(c_grid),
       m_cCellUpdater(c_grid) {}
 
-   bool CKilobotCommunicationEntityGridEntityUpdater::operator()(CKilobotCommunicationEntity& c_entity) {
+   bool CKilobotCustomCommunicationEntityGridEntityUpdater::operator()(CKilobotCustomCommunicationEntity& c_entity) {
       try {
          m_cCellUpdater.SetEntity(c_entity);
          m_cGrid.ForCellsInBoxRange(c_entity.GetPosition(),
@@ -315,7 +315,7 @@ namespace argos {
          return true;
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("While updating the kilobot entity grid for kilobot entity \"" << c_entity.GetContext() << c_entity.GetId() << "\"", ex);
+         THROW_ARGOSEXCEPTION_NESTED("While updating the kilobot_custom entity grid for kilobot_custom entity \"" << c_entity.GetContext() << c_entity.GetId() << "\"", ex);
       }
    }
 

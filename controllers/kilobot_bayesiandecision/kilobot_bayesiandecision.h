@@ -1,5 +1,5 @@
-#ifndef KILOBOT_BAYESIANDECISION_H
-#define KILOBOT_BAYESIANDECISION_H
+#ifndef BAYESIANDECISION_H
+#define BAYESIANDECISION_H
 
 #include <map>
 
@@ -8,23 +8,23 @@
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include <argos3/plugins/robots/kilobot/control_interface/kilolib.h>
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_led_actuator.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/kilolib.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_custom_led_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_ground_sensor.h>
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_communication_sensor.h>
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_communication_actuator.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_custom_communication_sensor.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_custom_communication_actuator.h>
 #include <argos3/core/utility/logging/argos_log.h>
 #include <boost/math/distributions/beta.hpp>
 
-// #include <argos3/plugins/robots/kilobot/control_interface/message_crc.h>
+// #include <argos3/plugins/robots/kilobot_custom/control_interface/message_crc.h>
 
 
 using namespace argos;
 using boost::math::beta_distribution;
 using boost::math::cdf;
 
-enum MovingStates {KILOBOT_STATE_STOP, KILOBOT_STATE_TURNING, KILOBOT_STATE_MOVING, KILOBOT_STATE_AVOIDING};
+enum MovingStates {STATE_STOP, STATE_TURNING, STATE_MOVING, STATE_AVOIDING};
 
 class CKilobotBayesianDecision : public CCI_Controller {
 
@@ -62,10 +62,10 @@ private:
     static UInt16 id_counter;
 
     CCI_DifferentialSteeringActuator* motors;
-    CCI_KilobotLEDActuator* leds;
+    CCI_KilobotCustomLEDActuator* leds;
     CCI_GroundSensor* ground_sensors;
-    CCI_KilobotCommunicationSensor * com_rx;
-    CCI_KilobotCommunicationActuator* com_tx;
+    CCI_KilobotCustomCommunicationSensor * com_rx;
+    CCI_KilobotCustomCommunicationActuator* com_tx;
 
     /* estados para controlar el paseo aleatorio*/
     MovingStates current_state;
@@ -111,7 +111,7 @@ private:
     UInt32 direction;
     SInt16 reading;
     message_t* out_msg;
-    CCI_KilobotCommunicationSensor::TPackets in_msgs;
+    CCI_KilobotCustomCommunicationSensor::TPackets in_msgs;
     UInt8 * byte_ptr;
     UInt16 id_msg;
     UInt32 obs_index_msg;

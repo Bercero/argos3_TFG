@@ -1,28 +1,28 @@
 /**
- * @file <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_communication_sensor.h>
+ * @file <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_custom_communication_sensor.h>
  *
- * @brief This file provides the definition of the kilobot communication sensor.
+ * @brief This file provides the definition of the kilobot_custom communication sensor.
  *
- * This file provides the definition of the kilobot communication sensor.
+ * This file provides the definition of the kilobot_custom communication sensor.
  *
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  */
 
-#ifndef CCI_KILOBOT_COMMUNICATION_SENSOR_H
-#define CCI_KILOBOT_COMMUNICATION_SENSOR_H
+#ifndef CCI_KILOBOT_CUSTOM_COMMUNICATION_SENSOR_H
+#define CCI_KILOBOT_CUSTOM_COMMUNICATION_SENSOR_H
 
 namespace argos {
-   class CCI_KilobotCommunicationSensor;
+   class CCI_KilobotCustomCommunicationSensor;
 }
 
 #include <argos3/core/control_interface/ci_sensor.h>
-#include <argos3/plugins/robots/kilobot/control_interface/kilolib.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/kilolib.h>
 #include <argos3/core/utility/datatypes/datatypes.h>
 #include <vector>
 
 namespace argos {
 
-   class CCI_KilobotCommunicationSensor : public CCI_Sensor {
+   class CCI_KilobotCustomCommunicationSensor : public CCI_Sensor {
 
    public:
 
@@ -35,8 +35,8 @@ namespace argos {
 
    public:
 
-      CCI_KilobotCommunicationSensor();
-      virtual ~CCI_KilobotCommunicationSensor() {}
+      CCI_KilobotCustomCommunicationSensor();
+      virtual ~CCI_KilobotCustomCommunicationSensor() {}
 
       const TPackets& GetPackets() const;
 

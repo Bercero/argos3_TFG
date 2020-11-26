@@ -13,8 +13,8 @@ CKilobotBayesianDecision::CKilobotBayesianDecision() :
    ground_sensors(NULL),
    com_rx(NULL),
    com_tx(NULL),
-   current_state(KILOBOT_STATE_STOP),
-   previous_state(KILOBOT_STATE_STOP),
+   current_state(STATE_STOP),
+   previous_state(STATE_STOP),
    mean_walk_duration(240),
    max_turning_steps(50),
    walking_steps(1),
@@ -47,10 +47,10 @@ CKilobotBayesianDecision::CKilobotBayesianDecision() :
 
 void CKilobotBayesianDecision::Init(TConfigurationNode& t_node) {
     motors = GetActuator<CCI_DifferentialSteeringActuator>("differential_steering");
-    leds = GetActuator<CCI_KilobotLEDActuator>("kilobot_led");
+    leds = GetActuator<CCI_KilobotCustomLEDActuator>("kilobot_custom_led");
     ground_sensors = GetSensor<CCI_GroundSensor>("ground");
-    com_rx = GetSensor<CCI_KilobotCommunicationSensor>("kilobot_communication");
-    com_tx = GetActuator<CCI_KilobotCommunicationActuator>("kilobot_communication");
+    com_rx = GetSensor<CCI_KilobotCustomCommunicationSensor>("kilobot_custom_communication");
+    com_tx = GetActuator<CCI_KilobotCustomCommunicationActuator>("kilobot_custom_communication");
 
     //leyendo del archivo de configuración
     TConfigurationNode experiment_conf = GetNode(CSimulator::GetInstance().GetConfigurationRoot(), "framework");
@@ -90,8 +90,8 @@ void CKilobotBayesianDecision::Reset() {
     //TODO el parametro del experimento original parece ser demasiado aqui
     walking_steps = rng->Exponential(mean_walk_duration);
 
-    current_state = KILOBOT_STATE_MOVING;
-    previous_state = KILOBOT_STATE_MOVING;
+    current_state = STATE_MOVING;
+    previous_state = STATE_MOVING;
     motor_L = motor_R = PIN_FORWARD;
     decision = -1;
     obs_index = 0;
@@ -133,15 +133,15 @@ void CKilobotBayesianDecision::ControlStep() {
    // max rotation: 180 degrees as determined by max_turning_steps
     switch(current_state) {
 
-        case KILOBOT_STATE_TURNING:
+        case STATE_TURNING:
             if( --turning_steps <= 0 ) {
                 motor_L = motor_R = PIN_FORWARD;
                 walking_steps = rng->Exponential(mean_walk_duration);
                 previous_state = current_state;
-                current_state = KILOBOT_STATE_MOVING;
+                current_state = STATE_MOVING;
             }
         break;
-        case KILOBOT_STATE_AVOIDING:
+        case STATE_AVOIDING:
             if( --walking_steps <= 0 ) {
                 direction = rng->Uniform(CRange<UInt32>(0,2));
                 if( direction == 0 ) {
@@ -155,10 +155,10 @@ void CKilobotBayesianDecision::ControlStep() {
                 //Giro de al menos 90 grados
                 turning_steps = rng->Uniform(CRange<UInt32>(max_turning_steps/2 ,max_turning_steps));
                 previous_state = current_state;
-                current_state = KILOBOT_STATE_TURNING;
+                current_state = STATE_TURNING;
             }
         break;
-        case KILOBOT_STATE_MOVING:
+        case STATE_MOVING:
             if( --walking_steps <= 0 ) {
                 direction = rng->Uniform(CRange<UInt32>(0,2));
                 if( direction == 0 ) {
@@ -171,11 +171,11 @@ void CKilobotBayesianDecision::ControlStep() {
                 }
                 turning_steps = rng->Uniform(CRange<UInt32>(0,max_turning_steps));
                 previous_state = current_state;
-                current_state = KILOBOT_STATE_TURNING;
+                current_state = STATE_TURNING;
             }
         break;
 
-        case KILOBOT_STATE_STOP:
+        case STATE_STOP:
         default:
         motor_L = motor_R = PIN_STOP;
         break;
@@ -189,11 +189,11 @@ void CKilobotBayesianDecision::ControlStep() {
 void CKilobotBayesianDecision::CheckGray() {
     std::vector<Real> readings  = ground_sensors->GetReadings();
     //detectando si ha llegado al margen de la arena
-    if(current_state != KILOBOT_STATE_AVOIDING
-        && previous_state != KILOBOT_STATE_AVOIDING
+    if(current_state != STATE_AVOIDING
+        && previous_state != STATE_AVOIDING
         && readings[1] > 0.1 && readings[1] < 0.9 ){
         previous_state = current_state;
-        current_state = KILOBOT_STATE_AVOIDING;
+        current_state = STATE_AVOIDING;
         walking_steps = 5 * ticks_per_second;
         motor_L = motor_R = - PIN_FORWARD;//marcha atras
     }
@@ -265,13 +265,13 @@ void CKilobotBayesianDecision::PollMessages(){
                 }
             }
             //detectando cuando si ha topado con otro kilobot
-            if(current_state != KILOBOT_STATE_AVOIDING &&
-                previous_state != KILOBOT_STATE_AVOIDING &&
+            if(current_state != STATE_AVOIDING &&
+                previous_state != STATE_AVOIDING &&
                 estimate_distance(& (in_msgs[i].Distance)) < 50)
             {
                 // leds->SetColor(CColor::BLUE);
                 previous_state = current_state;
-                current_state = KILOBOT_STATE_AVOIDING;
+                current_state = STATE_AVOIDING;
                 walking_steps = 5 * ticks_per_second;
                 motor_L = motor_R = - PIN_FORWARD;
             }

@@ -1,16 +1,16 @@
 /**
- * @file <argos3/plugins/robots/kilobot/simulator/qtopengl_kilobot.h>
+ * @file <argos3/plugins/robots/kilobot_custom/simulator/qtopengl_kilobot_custom.h>
  *
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  * @author Vito Trianni - <vito.trianni@istc.cnr.it>
  */
 
-#ifndef QTOPENGL_KILOBOT_H
-#define QTOPENGL_KILOBOT_H
+#ifndef QTOPENGL_KILOBOT_CUSTOM_H
+#define QTOPENGL_KILOBOT_CUSTOM_H
 
 namespace argos {
-   class CQTOpenGLKilobot;
-   class CKilobotEntity;
+   class CQTOpenGLKilobotCustom;
+   class CKilobotCustomEntity;
 }
 
 #ifdef __APPLE__
@@ -21,15 +21,15 @@ namespace argos {
 
 namespace argos {
 
-   class CQTOpenGLKilobot {
+   class CQTOpenGLKilobotCustom {
 
    public:
 
-      CQTOpenGLKilobot();
+      CQTOpenGLKilobotCustom();
 
-      virtual ~CQTOpenGLKilobot();
+      virtual ~CQTOpenGLKilobotCustom();
 
-      virtual void Draw(CKilobotEntity& c_entity);
+      virtual void Draw(CKilobotCustomEntity& c_entity);
 
    protected:
 
@@ -63,11 +63,11 @@ namespace argos {
       /** List corresponding to the materialless wheel */
       GLuint m_unBasicWheelList;
 
-      /** kilobot wheel */
+      /** kilobot_custom wheel */
       GLuint m_unWheelList;
-      /** kilobot base module */
+      /** kilobot_custom base module */
       GLuint m_unBaseList;
-      /** kilobot LED */
+      /** kilobot_custom LED */
       GLuint m_unLEDList;
 
       /** Number of vertices to display the round parts

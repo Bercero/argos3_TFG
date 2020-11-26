@@ -1,22 +1,22 @@
 /**
- * @file <argos3/plugins/robots/kilobot/simulator/kilobot_light_rotzonly_sensor.h>
+ * @file <argos3/plugins/robots/kilobot_custom/simulator/kilobot_custom_light_rotzonly_sensor.h>
  *
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  * @author Vito Trianni - <vito.trianni@istc.cnr.it>
  */
 
-#ifndef KILOBOT_LIGHT_ROTZONLY_SENSOR_H
-#define KILOBOT_LIGHT_ROTZONLY_SENSOR_H
+#ifndef KILOBOT_CUSTOM_LIGHT_ROTZONLY_SENSOR_H
+#define KILOBOT_CUSTOM_LIGHT_ROTZONLY_SENSOR_H
 
 #include <string>
 #include <map>
 
 namespace argos {
-   class CKilobotLightRotZOnlySensor;
+   class CKilobotCustomLightRotZOnlySensor;
    class CLightSensorEquippedEntity;
 }
 
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_light_sensor.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_custom_light_sensor.h>
 #include <argos3/core/utility/math/range.h>
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/simulator/space/space.h>
@@ -24,14 +24,14 @@ namespace argos {
 
 namespace argos {
 
-   class CKilobotLightRotZOnlySensor : public CSimulatedSensor,
-                                       public CCI_KilobotLightSensor {
+   class CKilobotCustomLightRotZOnlySensor : public CSimulatedSensor,
+                                       public CCI_KilobotCustomLightSensor {
 
    public:
 
-      CKilobotLightRotZOnlySensor();
+      CKilobotCustomLightRotZOnlySensor();
 
-      virtual ~CKilobotLightRotZOnlySensor() {}
+      virtual ~CKilobotCustomLightRotZOnlySensor() {}
 
       virtual void SetRobot(CComposableEntity& c_entity);
 

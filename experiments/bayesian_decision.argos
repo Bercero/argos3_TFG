@@ -16,12 +16,12 @@
 
             <actuators>
                 <differential_steering implementation="default" />
-                <kilobot_led implementation="default"/>
-                <kilobot_communication implementation="default" />
+                <kilobot_custom_led implementation="default"/>
+                <kilobot_custom_communication implementation="default" />
             </actuators>
             <sensors>
                 <ground implementation="rot_z_only" />
-                <kilobot_communication implementation="default" medium="kilomedium" show_rays="true"/>
+                <kilobot_custom_communication implementation="default" medium="kilomedium" show_rays="true"/>
             </sensors>
             <params mean_walk_duration="50" observation_interval="45" prior="10" feedback="true" credible_threshold="0.90"/>
         </kilobot_bayesiandecision_controller>
@@ -64,17 +64,17 @@
             <position method="uniform" min="-1.10,-1.10,0" max="1.10,1.10,0" />
             <orientation method="uniform" min="0,0,0" max="360,0,0" />
             <entity quantity="100" max_trials="1000">
-                <kilobot id="k">
+                <kilobot_custom id="k">
                     <controller config="kbdc" />
-                </kilobot>
+                </kilobot_custom>
             </entity>
         </distribute>
 
 
-        <!-- <kilobot id="k_0">
+        <!-- <kilobot_custom id="k_0">
             <body position="0,0.04,0" orientation="0,0,0" />
             <controller config="kbdc"/>
-        </kilobot> -->
+        </kilobot_custom> -->
 
     </arena>
 
@@ -84,7 +84,7 @@
 
     <media>
         <!-- TODO parametros temporales -->
-        <kilobot_communication id="kilomedium" message_drop_prob="0.0" ignore_conflicts="true"/>
+        <kilobot_custom_communication id="kilomedium" message_drop_prob="0.0" ignore_conflicts="true"/>
     </media>
     <visualization>
         <qt-opengl>

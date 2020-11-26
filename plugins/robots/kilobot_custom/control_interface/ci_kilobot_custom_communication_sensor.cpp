@@ -1,10 +1,10 @@
 /**
- * @file <argos3/plugins/robots/foot-bot/control_interface/ci_kilobot_communication_sensor.cpp>
+ * @file <argos3/plugins/robots/foot-bot/control_interface/ci_kilobot_custom_communication_sensor.cpp>
  *
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  */
 
-#include "ci_kilobot_communication_sensor.h"
+#include "ci_kilobot_custom_communication_sensor.h"
 
 #ifdef ARGOS_WITH_LUA
 #include <argos3/core/wrappers/lua/lua_utility.h>
@@ -15,21 +15,21 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CCI_KilobotCommunicationSensor::CCI_KilobotCommunicationSensor() :
+   CCI_KilobotCustomCommunicationSensor::CCI_KilobotCustomCommunicationSensor() :
       m_bMessageSent(false) {
    }
 
    /****************************************/
    /****************************************/
 
-   const CCI_KilobotCommunicationSensor::TPackets& CCI_KilobotCommunicationSensor::GetPackets() const {
+   const CCI_KilobotCustomCommunicationSensor::TPackets& CCI_KilobotCustomCommunicationSensor::GetPackets() const {
       return m_tPackets;
    }
 
    /****************************************/
    /****************************************/
 
-   bool CCI_KilobotCommunicationSensor::MessageSent() const {
+   bool CCI_KilobotCustomCommunicationSensor::MessageSent() const {
       return m_bMessageSent;
    }
 
@@ -37,7 +37,7 @@ namespace argos {
    /****************************************/
 
 #ifdef ARGOS_WITH_LUA
-   void CCI_KilobotCommunicationSensor::CreateLuaState(lua_State* pt_lua_state) {
+   void CCI_KilobotCustomCommunicationSensor::CreateLuaState(lua_State* pt_lua_state) {
       // TODO
    }
 #endif
@@ -46,7 +46,7 @@ namespace argos {
    /****************************************/
 
 #ifdef ARGOS_WITH_LUA
-   void CCI_KilobotCommunicationSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
+   void CCI_KilobotCustomCommunicationSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
       // TODO
    }
 #endif

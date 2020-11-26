@@ -1,5 +1,5 @@
 /**
- * @file <argos3/plugins/robots/kilobot/simulator/kilobot_light_rotzonly_sensor.cpp>
+ * @file <argos3/plugins/robots/kilobot_custom/simulator/kilobot_custom_light_rotzonly_sensor.cpp>
  *
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  */
@@ -10,8 +10,8 @@
 #include <argos3/plugins/simulator/entities/light_entity.h>
 #include <argos3/plugins/simulator/entities/light_sensor_equipped_entity.h>
 
-#include "kilobot_measures.h"
-#include "kilobot_light_rotzonly_sensor.h"
+#include "kilobot_custom_measures.h"
+#include "kilobot_custom_light_rotzonly_sensor.h"
 
 namespace argos {
 
@@ -41,7 +41,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CKilobotLightRotZOnlySensor::CKilobotLightRotZOnlySensor() :
+   CKilobotCustomLightRotZOnlySensor::CKilobotCustomLightRotZOnlySensor() :
       m_pcEmbodiedEntity(NULL),
       m_bShowRays(false),
       m_pcRNG(NULL),
@@ -51,7 +51,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CKilobotLightRotZOnlySensor::SetRobot(CComposableEntity& c_entity) {
+   void CKilobotCustomLightRotZOnlySensor::SetRobot(CComposableEntity& c_entity) {
       try {
          m_pcEmbodiedEntity = &(c_entity.GetComponent<CEmbodiedEntity>("body"));
          m_pcControllableEntity = &(c_entity.GetComponent<CControllableEntity>("controller"));
@@ -59,14 +59,14 @@ namespace argos {
          m_pcLightEntity->Enable();
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Can't set robot for the kilobot light default sensor", ex);
+         THROW_ARGOSEXCEPTION_NESTED("Can't set robot for the kilobot_custom light default sensor", ex);
       }
    }
 
    /****************************************/
    /****************************************/
 
-   void CKilobotLightRotZOnlySensor::Init(TConfigurationNode& t_tree) {
+   void CKilobotCustomLightRotZOnlySensor::Init(TConfigurationNode& t_tree) {
       try {
          /* Show rays? */
          GetNodeAttributeOrDefault(t_tree, "show_rays", m_bShowRays, m_bShowRays);
@@ -90,10 +90,10 @@ namespace argos {
    /****************************************/
    /****************************************/
    
-   void CKilobotLightRotZOnlySensor::Update() {
+   void CKilobotCustomLightRotZOnlySensor::Update() {
       /* Erase reading */
       m_nReading = 0;
-      /* Get kilobot orientation in the world */
+      /* Get kilobot_custom orientation in the world */
       CRadians cOrientationZ, cOrientationY, cOrientationX;
       m_pcEmbodiedEntity->GetOriginAnchor().Orientation.ToEulerAngles(cOrientationZ,
                                                                       cOrientationY,
@@ -102,8 +102,8 @@ namespace argos {
       CRay3 cOcclusionCheckRay;
       cOcclusionCheckRay.SetStart(m_pcLightEntity->GetSensor(0).Anchor.Position);
       CVector3 cRobotToLight;
-      /* Buffer for the angle of the light wrt to the kilobot */
-      CRadians cAngleLightWrtKilobot;
+      /* Buffer for the angle of the light wrt to the kilobot_custom */
+      CRadians cAngleLightWrtKilobotCustom;
       /* Buffers to contain data about the intersection */
       SEmbodiedEntityIntersectionItem sIntersection;
       /* List of light entities */
@@ -122,27 +122,27 @@ namespace argos {
          if(cLight.GetIntensity() > 0.0f) {
             /* Set the ray end */
             cOcclusionCheckRay.SetEnd(cLight.GetPosition());
-            /* Check occlusion between the kilobot and the light */
+            /* Check occlusion between the kilobot_custom and the light */
             if( !GetClosestEmbodiedEntityIntersectedByRay(sIntersection,
                                                           cOcclusionCheckRay,
                                                           *m_pcEmbodiedEntity)) {
                /* The light is not occluded */
                if(m_bShowRays)
                   m_pcControllableEntity->AddCheckedRay(false, cOcclusionCheckRay);
-               /* Get the distance between the light and the kilobot */
+               /* Get the distance between the light and the kilobot_custom */
                cOcclusionCheckRay.ToVector(cRobotToLight);
                /*
                 * Linearly scale the distance with the light intensity
                 * The greater the intensity, the smaller the distance
                 */
                cRobotToLight /= cLight.GetIntensity();
-               /* Get the angle wrt to kilobot rotation */
-               cAngleLightWrtKilobot = cRobotToLight.GetZAngle();
-               cAngleLightWrtKilobot -= cOrientationZ;
+               /* Get the angle wrt to kilobot_custom rotation */
+               cAngleLightWrtKilobotCustom = cRobotToLight.GetZAngle();
+               cAngleLightWrtKilobotCustom -= cOrientationZ;
                /* Set the actual readings */
                Real fReading = cRobotToLight.Length();
                CRadians cAngularDistanceFromOptimalLightReceptionPoint =
-                  Abs((cAngleLightWrtKilobot - KILOBOT_LIGHT_SENSOR_ANGLE).SignedNormalize());
+                  Abs((cAngleLightWrtKilobotCustom - KILOBOT_CUSTOM_LIGHT_SENSOR_ANGLE).SignedNormalize());
                m_nReading += ComputeReading(fReading,
                                             cAngularDistanceFromOptimalLightReceptionPoint);
             }
@@ -166,18 +166,18 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CKilobotLightRotZOnlySensor::Reset() {
+   void CKilobotCustomLightRotZOnlySensor::Reset() {
       m_nReading = 0;
    }
 
    /****************************************/
    /****************************************/
 
-   REGISTER_SENSOR(CKilobotLightRotZOnlySensor,
-                   "kilobot_light", "rot_z_only",
+   REGISTER_SENSOR(CKilobotCustomLightRotZOnlySensor,
+                   "kilobot_custom_light", "rot_z_only",
                    "Carlo Pinciroli [ilpincy@gmail.com] - Vito Trianni [vito.trianni@istc.cnr.it]",
                    "1.0",
-                   "The kilobot light sensor (optimized for 2D).",
+                   "The kilobot_custom light sensor (optimized for 2D).",
                    "This sensor returns a value between 0 and 1, where 0 means nothing within range\n"
                    "and 1 means that the perceived light saturates the sensor. Values between 0 and 1\n"
                    "depend on the distance of the perceived light. Each reading R is calculated with\n"
@@ -196,7 +196,7 @@ namespace argos {
                    "      ...\n"
                    "      <sensors>\n"
                    "        ...\n"
-                   "        <kilobot_light implementation=\"rot_z_only\" />\n"
+                   "        <kilobot_custom_light implementation=\"rot_z_only\" />\n"
                    "        ...\n"
                    "      </sensors>\n"
                    "      ...\n"
@@ -217,7 +217,7 @@ namespace argos {
                    "      ...\n"
                    "      <sensors>\n"
                    "        ...\n"
-                   "        <kilobot_light implementation=\"rot_z_only\"\n"
+                   "        <kilobot_custom_light implementation=\"rot_z_only\"\n"
                    "                       show_rays=\"true\" />\n"
                    "        ...\n"
                    "      </sensors>\n"
@@ -235,7 +235,7 @@ namespace argos {
                    "      ...\n"
                    "      <sensors>\n"
                    "        ...\n"
-                   "        <kilobot_light implementation=\"rot_z_only\"\n"
+                   "        <kilobot_custom_light implementation=\"rot_z_only\"\n"
                    "                       noise_level=\"0.1\" />\n"
                    "        ...\n"
                    "      </sensors>\n"

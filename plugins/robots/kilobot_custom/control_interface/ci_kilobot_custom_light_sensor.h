@@ -1,19 +1,19 @@
 /**
- * @file <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_light_sensor.h>
+ * @file <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_custom_light_sensor.h>
  *
- * @brief This file provides the definition of the kilobot light sensor.
+ * @brief This file provides the definition of the kilobot_custom light sensor.
  *
- * This file provides the definition of the kilobot light sensor.
+ * This file provides the definition of the kilobot_custom light sensor.
  *
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  * @author Vito Trianni - <vito.trianni@istc.cnr.it>
  */
 
-#ifndef CCI_KILOBOT_LIGHT_SENSOR_H
-#define CCI_KILOBOT_LIGHT_SENSOR_H
+#ifndef CCI_KILOBOT_CUSTOM_LIGHT_SENSOR_H
+#define CCI_KILOBOT_CUSTOM_LIGHT_SENSOR_H
 
 namespace argos {
-   class CCI_KilobotLightSensor;
+   class CCI_KilobotCustomLightSensor;
 }
 
 #include <argos3/core/control_interface/ci_sensor.h>
@@ -22,12 +22,12 @@ namespace argos {
 
 namespace argos {
 
-   class CCI_KilobotLightSensor : public CCI_Sensor {
+   class CCI_KilobotCustomLightSensor : public CCI_Sensor {
 
    public:
 
-      CCI_KilobotLightSensor();
-      virtual ~CCI_KilobotLightSensor() {}
+      CCI_KilobotCustomLightSensor();
+      virtual ~CCI_KilobotCustomLightSensor() {}
 
       /**
        * Returns the readings of this sensor
