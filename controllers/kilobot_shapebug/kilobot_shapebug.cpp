@@ -1,13 +1,13 @@
-#include "kilobot_formation.h"
+#include "kilobot_shapebug.h"
 
 //velocidades para asignar a los motores
 #define PIN_FORWARD 1.0f;
 #define PIN_TURN    1.57f;
 #define PIN_STOP    0.0f;
 
-UInt16 CKilobotFormation::id_counter = 0;
+UInt16 CKilobotShapebug::id_counter = 0;
 
-CKilobotFormation::CKilobotFormation() :
+CKilobotShapebug::CKilobotShapebug() :
    motors(NULL),
    leds(NULL),
    // ground_sensors(NULL),
@@ -23,19 +23,19 @@ CKilobotFormation::CKilobotFormation() :
    motor_R(0.0f)
 {
    rng = CRandom::CreateRNG( "argos" );
-   CKilobotFormation::SetIdNum(this);
+   CKilobotShapebug::SetIdNum(this);
 }
 
 /****************************************/
 /* Se leen lor parametros de confinguración*/
 /****************************************/
 
-void CKilobotFormation::Init(TConfigurationNode& t_node) {
+void CKilobotShapebug::Init(TConfigurationNode& t_node) {
     motors = GetActuator<CCI_DifferentialSteeringActuator>("differential_steering");
-    leds = GetActuator<CCI_KilobotLEDActuator>("kilobot_led");
+    leds = GetActuator<CCI_KilobotCustomLEDActuator>("kilobot_custom_led");
     // ground_sensors = GetSensor<CCI_GroundSensor>("ground");
-    com_rx = GetSensor<CCI_KilobotCommunicationSensor>("kilobot_communication");
-    com_tx = GetActuator<CCI_KilobotCommunicationActuator>("kilobot_communication");
+    com_rx = GetSensor<CCI_KilobotCustomCommunicationSensor>("kilobot_custom_communication");
+    com_tx = GetActuator<CCI_KilobotCustomCommunicationActuator>("kilobot_custom_communication");
 
     //leyendo del archivo de configuración
     TConfigurationNode experiment_conf = GetNode(CSimulator::GetInstance().GetConfigurationRoot(), "framework");
@@ -54,7 +54,7 @@ void CKilobotFormation::Init(TConfigurationNode& t_node) {
 /****************************************/
 /****************************************/
 //TODO parece que se llama dos veces cuando se pulsa reset en la interfaz grafica. Es un bug?
-void CKilobotFormation::Reset() {
+void CKilobotShapebug::Reset() {
     walking_steps = rng->Exponential(mean_walk_duration);
 
     current_state = KILOBOT_STATE_MOVING;
@@ -68,7 +68,7 @@ void CKilobotFormation::Reset() {
 /****************************************/
 /****************************************/
 
-void CKilobotFormation::ControlStep() {
+void CKilobotShapebug::ControlStep() {
 
     switch(current_state) {
 
@@ -124,9 +124,9 @@ void CKilobotFormation::ControlStep() {
 }
 
 
-void CKilobotFormation::SetIdNum(CKilobotFormation* robot){
+void CKilobotShapebug::SetIdNum(CKilobotShapebug* robot){
     robot->id_num = id_counter ++;
 }
 
 
-REGISTER_CONTROLLER(CKilobotFormation, "kilobot_formation_controller")
+REGISTER_CONTROLLER(CKilobotShapebug, "kilobot_shapebug_controller")

@@ -9,16 +9,16 @@ execute_process(
 #
 # General compilation flags
 #
-# TODO -fPIC solo es necesario para el bayesian decision en principio
+# TODO -fPIC necesaria para kilobot_bayesiandecision
+# TODO quitar flag Wno-reorder 
 set(CMAKE_C_FLAGS                  "-Wall -fPIC")
+set(CMAKE_CXX_FLAGS                "-Wall -Wno-reorder -fPIC")
 if(ARGOS_BUILD_NATIVE)
   set(CMAKE_C_FLAGS                "${CMAKE_C_FLAGS} -mtune=native -march=native")
 endif()
 set(CMAKE_C_FLAGS_RELEASE          "-Os -DNDEBUG")
 set(CMAKE_C_FLAGS_DEBUG            "-ggdb3")
 set(CMAKE_C_FLAGS_RELWITHDEBINFO   "${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS_RELEASE}")
-# TODO quitar flag Wno-reorder
-set(CMAKE_CXX_FLAGS                "-Wall -Wno-reorder")
 if(ARGOS_BUILD_NATIVE)
   set(CMAKE_CXX_FLAGS              "${CMAKE_CXX_FLAGS} -mtune=native -march=native")
 endif()

@@ -1,5 +1,5 @@
-#ifndef KILOBOT_FORMATION_H
-#define KILOBOT_FORMATION_H
+#ifndef KILOBOT_SHAPEBUG_H
+#define KILOBOT_SHAPEBUG_H
 
 #include <map>
 
@@ -8,31 +8,26 @@
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include <argos3/plugins/robots/kilobot/control_interface/kilolib.h>
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_led_actuator.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/kilolib.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_custom_led_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_ground_sensor.h>
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_communication_sensor.h>
-#include <argos3/plugins/robots/kilobot/control_interface/ci_kilobot_communication_actuator.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_custom_communication_sensor.h>
+#include <argos3/plugins/robots/kilobot_custom/control_interface/ci_kilobot_custom_communication_actuator.h>
 #include <argos3/core/utility/logging/argos_log.h>
-#include <boost/math/distributions/beta.hpp>
-
-// #include <argos3/plugins/robots/kilobot/control_interface/message_crc.h>
 
 
 using namespace argos;
-using boost::math::beta_distribution;
-using boost::math::cdf;
 
 enum MovingStates {KILOBOT_STATE_STOP, KILOBOT_STATE_TURNING, KILOBOT_STATE_MOVING, KILOBOT_STATE_AVOIDING};
 
-class CKilobotFormation : public CCI_Controller {
+class CKilobotShapebug : public CCI_Controller {
 
 public:
 
-    CKilobotFormation();
+    CKilobotShapebug();
 
-    virtual ~CKilobotFormation() {}
+    virtual ~CKilobotShapebug() {}
 
     void Init(TConfigurationNode& t_node);
 
@@ -48,16 +43,16 @@ public:
 private:
     //metodo para asignar un id numerico unico, mas conveniente que la cadena de caracteres para
     //el ancho de banda limitado a 9 bytes de los kylobots
-    void static SetIdNum(CKilobotFormation* robot);
+    void static SetIdNum(CKilobotShapebug* robot);
     static UInt16 id_counter;
     UInt16 id_num;
-    
+
 
     CCI_DifferentialSteeringActuator* motors;
-    CCI_KilobotLEDActuator* leds;
+    CCI_KilobotCustomLEDActuator* leds;
     // CCI_GroundSensor* ground_sensors;
-    CCI_KilobotCommunicationSensor * com_rx;
-    CCI_KilobotCommunicationActuator* com_tx;
+    CCI_KilobotCustomCommunicationSensor * com_rx;
+    CCI_KilobotCustomCommunicationActuator* com_tx;
 
     /* estados para controlar el paseo aleatorio*/
     MovingStates current_state;
