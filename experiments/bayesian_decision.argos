@@ -89,9 +89,7 @@
     <visualization>
         <qt-opengl>
             <camera>
-              <placements>
-                <placement index="0" position="0,0,2" look_at="0,0,0" up="0,1,0" lens_focal_length="20" />
-              </placements>
+              <placement idx="0" position="0,0,2" look_at="0,0,0" up="0,1,0" lens_focal_length="20" />
             </camera>
         </qt-opengl>
     </visualization>
